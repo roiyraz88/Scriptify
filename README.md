@@ -41,10 +41,3 @@ Scriptify is a web app that lets **anyone** (even without programming knowledge)
 
 ---
 
-## 📦 Installation (For Local Dev)
-
-```bash
-git clone https://github.com/your-username/scriptify.git
-cd scriptify
-npm install
-node server.js
