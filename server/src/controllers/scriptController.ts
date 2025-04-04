@@ -8,13 +8,13 @@ const fileName = `send_email_${Date.now()}.py`;
 const filePath = path.join(__dirname, "../scripts", fileName);
 
 const generateEmailScript = (req: Request, res: Response) => {
-  const { subject, body } = req.body;
-  if (!subject || !body) {
-    return res.status(400).json({ error: "Subject and body are required" });
+  const { fromEmail, toEmail, subject, body, fileName, appPassword } = req.body;
+  if (!subject || !body || !fromEmail || !toEmail || !appPassword) {
+    return res.status(400).json({ error: "Missing required fields" });
   }
 
   try {
-    const script = generateScript(subject, body);
+    const script = generateScript(fromEmail, toEmail, subject, body, fileName, appPassword);
     fs.writeFileSync(filePath, script, { encoding: "utf8" });
     return res.download(filePath, (err) => {
       if (err) {

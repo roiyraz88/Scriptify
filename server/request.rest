@@ -1,2 +1,34 @@
-GET http://localhost:3000/ping
+### 1. הרשמה של משתמש חדש
+POST http://localhost:5000/api/auth/register
+Content-Type: application/json
 
+{
+  "email": "test1@example.com",
+  "password": "123456"
+}
+
+###
+
+### 2. התחברות וקבלת access + refresh token
+POST http://localhost:5000/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "test1@example.com",
+  "password": "123456"
+}
+
+###
+
+### 3. קבלת access token חדש לפי refresh token (נשלח מה-cookie)
+GET http://localhost:5000/api/auth/refresh
+Content-Type: application/json
+
+{
+    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2VmZDhkNTcyYTU5OTVhYzA1Nzg2MzciLCJpYXQiOjE3NDM3NzI5ODEsImV4cCI6MTc0NDM3Nzc4MX0.YS25KMr9XJx4vHFdRGxPqpw5HoNX6uXS4xZVOB7Hzeo"
+}
+
+###
+
+### 4. התנתקות – מחיקת refresh token מה-DB ומה-cookie
+POST http://localhost:5000/api/auth/logout

@@ -1,4 +1,4 @@
-const generateScript = (
+export const generateScript = (
     fromEmail: string,
     toEmail: string,
     subject: string,
@@ -30,4 +30,6 @@ const generateScript = (
       smtp.send_message(msg)
   `;
   };
+
+
   
