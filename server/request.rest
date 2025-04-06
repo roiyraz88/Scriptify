@@ -3,8 +3,10 @@ POST http://localhost:5000/api/auth/register
 Content-Type: application/json
 
 {
-  "email": "test1@example.com",
-  "password": "123456"
+  "name": "Test User",
+  "email": "test2@example.com",
+  "password": "User123",
+  "confirmPassword": "User123"
 }
 
 ###
@@ -14,8 +16,8 @@ POST http://localhost:5000/api/auth/login
 Content-Type: application/json
 
 {
-  "email": "test1@example.com",
-  "password": "123456"
+  "email": "test2@example.com",
+  "password": "User123"
 }
 
 ###
@@ -32,3 +34,18 @@ Content-Type: application/json
 
 ### 4. התנתקות – מחיקת refresh token מה-DB ומה-cookie
 POST http://localhost:5000/api/auth/logout
+
+###
+
+### יצירת סקריפט job-alert חדש
+POST http://localhost:5000/api/scripts/generate-job-alert
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2YwZmM1Nzk1YjM1NmZmMTBiZjMxZTQiLCJpYXQiOjE3NDM4NDY1MTIsImV4cCI6MTc0Mzg0NzQxMn0.c5jlhs4WOOz6JpCp_je_WI6D25TBCHnF0YAOR1Ytxno
+Content-Type: application/json
+
+{
+  "serpApiKey": "9a0bbc760bc361ad3e18040140ee489492f4ac6b2c4deb48d265785f520061af",
+  "emailSender": "roiyraz88@gmail.com",
+  "emailPassword": "gkug zzma ihjn tumt",
+  "emailRecipient": "roiyraz88@gmail.com",
+  "query": "site:comeet.com/jobs junior"
+}
