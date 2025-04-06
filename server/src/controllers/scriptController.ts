@@ -1,31 +1,51 @@
-import { Response, Request } from "express";
-import { generateScript } from "../services/scriptService";
+import { Request, Response } from "express";
 import fs from "fs";
 import path from "path";
+import Script from "../models/Script";
+import { generateJobAlertScript } from "../services/scriptService";
 
+export const generateJobAlert = async (req: Request, res: Response) => {
+  const { serpApiKey, emailSender, emailPassword, emailRecipient, query } =
+    req.body;
+  const userId = req.userId;
 
-const fileName = `send_email_${Date.now()}.py`;
-const filePath = path.join(__dirname, "../scripts", fileName);
-
-const generateEmailScript = (req: Request, res: Response) => {
-  const { fromEmail, toEmail, subject, body, fileName, appPassword } = req.body;
-  if (!subject || !body || !fromEmail || !toEmail || !appPassword) {
-    return res.status(400).json({ error: "Missing required fields" });
+  if (
+    !serpApiKey ||
+    !emailSender ||
+    !emailPassword ||
+    !emailRecipient ||
+    !query
+  ) {
+    res.status(400).json({ message: "Missing required fields" });
+    return;
   }
 
   try {
-    const script = generateScript(fromEmail, toEmail, subject, body, fileName, appPassword);
-    fs.writeFileSync(filePath, script, { encoding: "utf8" });
-    return res.download(filePath, (err) => {
-      if (err) {
-        console.error("Error downloading the file:", err);
-        return res.status(500).json({ error: "Error downloading the file" });
-        }});
-      } catch (error) {
-    return res
-      .status(500)
-      .json({ error: "An error occurred while generating the script" });
+    const scriptText = generateJobAlertScript(
+      serpApiKey,
+      emailSender,
+      emailPassword,
+      emailRecipient,
+      query
+    );
+
+    const fileName = `job_alert_${Date.now()}.py`;
+    const filePath = path.join(__dirname, `../scripts/${fileName}`);
+
+    fs.writeFileSync(filePath, scriptText);
+
+    await Script.create({
+      title: "Job Alert Script",
+      filePath,
+      type: "job-alert",
+      user: userId,
+    });
+
+    res.download(filePath, fileName);
+    return;
+  } catch (error) {
+    console.error("Error generating script:", error);
+    res.status(500).json({ message: "Server error while generating script" });
+    return;
   }
 };
-
-export { generateEmailScript };

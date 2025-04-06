@@ -1,20 +1,13 @@
-export const generateJobAlertScript = (
-  serpApiKey: string,
-  emailSender: string,
-  emailPassword: string,
-  emailRecipient: string,
-  query: string
-): string => {
-  return `
+
   import requests
   import yagmail
   
   
-  SERP_API_KEY = "${serpApiKey}"
-  EMAIL_SENDER = "${emailSender}"
-  EMAIL_PASSWORD = "${emailPassword}"
-  EMAIL_RECIPIENT = "${emailRecipient}"
-  QUERY = '${query}'
+  SERP_API_KEY = "9a0bbc760bc361ad3e18040140ee489492f4ac6b2c4deb48d265785f520061af"
+  EMAIL_SENDER = "roiyraz88@gmail.com"
+  EMAIL_PASSWORD = "gkug zzma ihjn tumt"
+  EMAIL_RECIPIENT = "roiyraz88@gmail.com"
+  QUERY = 'site:comeet.com/jobs junior'
   # =================================
   
   SENT_LINKS = set()
@@ -37,12 +30,11 @@ export const generateJobAlertScript = (
           link = result.get("link")
   
           if link not in SENT_LINKS:
-              message = f"📢 משרה חדשה:\\n{title}\\n🔗 {link}"
+              message = f"📢 משרה חדשה:\n{title}\n🔗 {link}"
               print("נשלח מייל על:", title)
               yag.send(to=EMAIL_RECIPIENT, subject="משרה חדשה 🎯", contents=message)
               SENT_LINKS.add(link)
   
   # קריאה לפונקציה
   search_and_notify()
-  `;
-};
+  

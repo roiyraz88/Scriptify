@@ -4,9 +4,9 @@
   "main": "server.js",
   "scripts": {
     "test": "jest --detectOpenHandles --forceExit",
-    "start": "node app.ts",
+    "start": "node server.ts",
     "lint": "eslint . --ext .ts",
-    "dev": "nodemon ./src/app.ts"
+    "dev": "nodemon ./src/server.ts"
   },
   "keywords": [],
   "author": "",

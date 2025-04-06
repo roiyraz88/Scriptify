@@ -100,6 +100,8 @@ export const login = async (req: Request, res: Response) => {
       user: {
         _id: user._id,
         email: user.email,
+        name: user.name,
+        scripts: user.scripts,
       },
     });
 };
