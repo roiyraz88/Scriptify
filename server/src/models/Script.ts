@@ -1,25 +1,20 @@
-import mongoose, { Schema, Document } from "mongoose";
+// models/Script.ts
+import mongoose from "mongoose";
 
-export interface IScript extends Document {
-  title: string;
-  filePath: string;
-  type: "job-alert" | "email" | "custom";
-  user: mongoose.Types.ObjectId;
-  createdAt: Date;
-}
-
-const scriptSchema = new Schema<IScript>(
-  {
-    title: { type: String, required: true },
-    filePath: { type: String, required: true },
-    type: {
-      type: String,
-      enum: ["job-alert", "email", "custom"],
-      required: true,
-    },
-    user: { type: Schema.Types.ObjectId, ref: "User", required: true },
+const ScriptSchema = new mongoose.Schema({
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true,
   },
-  { timestamps: { createdAt: true, updatedAt: false } }
-);
+  emailRecipient: { type: String, required: true },
+  query: { type: String, required: true },
+  resultLimit: { type: Number, default: 10 },
+  frequencyType: { type: String, enum: ["Every day", "Every week"], required: true },
+  dailyTime: { type: String },
+  weeklyDay: { type: String },
+  weeklyTime: { type: String },
+  createdAt: { type: Date, default: Date.now },
+});
 
-export default mongoose.model<IScript>("Script", scriptSchema);
+export default mongoose.model("Script", ScriptSchema);
