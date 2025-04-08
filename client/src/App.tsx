@@ -8,6 +8,7 @@ import RegisterModal from "./components/RegisterModal";
 import LandingPage from "./pages/LandingPage";
 import HowItWorks from "./pages/HowItWorks";
 import GenerateScript from "./pages/GenerateScript";
+import ProfilePage from "./pages/ProfilePage";
 import ProtectedRoute from "./routes/ProtectedRoute";
 
 function App() {
@@ -38,6 +39,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <GenerateScript />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <ProfilePage />
                 </ProtectedRoute>
               }
             />
