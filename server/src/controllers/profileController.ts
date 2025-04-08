@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import Script from "../models/Script";
 
-// 📥 GET scripts (כבר קיים)
 export const getMyScripts = async (req: Request, res: Response) => {
   try {
     const scripts = await Script.find({ owner: req.userId }).sort({
@@ -13,7 +12,6 @@ export const getMyScripts = async (req: Request, res: Response) => {
   }
 };
 
-// 🗑️ DELETE /my-scripts/:id
 export const deleteScript = async (req: Request, res: Response) => {
   const scriptId = req.params.id;
   const userId = req.userId;
@@ -35,7 +33,6 @@ export const deleteScript = async (req: Request, res: Response) => {
   }
 };
 
-// ✏️ PUT /my-scripts/:id
 export const updateScript = async (req: Request, res: Response) => {
   const scriptId = req.params.id;
   const userId = req.userId;
@@ -59,7 +56,7 @@ export const updateScript = async (req: Request, res: Response) => {
         weeklyDay,
         weeklyTime,
       },
-      { new: true } // מחזיר את הסקריפט לאחר העדכון
+      { new: true } 
     );
 
     if (!script) {
