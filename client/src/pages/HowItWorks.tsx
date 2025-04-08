@@ -1,4 +1,4 @@
-import { Box, Container, Typography, Grid } from "@mui/material";
+import { Box, Container, Typography, Grid, Paper } from "@mui/material";
 import { Bolt, Edit, Download } from "@mui/icons-material";
 
 function HowItWorks() {
@@ -6,50 +6,91 @@ function HowItWorks() {
     <Box
       sx={{
         minHeight: "100vh",
-        bgcolor: "background.default",
-        color: "text.primary",
+        bgcolor: "#121212",
+        color: "white",
         py: 10,
         px: 3,
       }}
     >
       <Container maxWidth="lg">
-        <Typography variant="h3" align="center" gutterBottom fontWeight={600}>
+        <Typography
+          variant="h3"
+          align="center"
+          gutterBottom
+          fontWeight={700}
+          sx={{ color: "#fff" }}
+        >
           How It Works
         </Typography>
 
-        <Typography variant="h6" align="center" color="text.secondary" mb={6}>
-          In just 3 simple steps, Scriptify helps you turn ideas into working Python scripts.
+        <Typography
+          variant="h6"
+          align="center"
+          color="gray"
+          mb={6}
+        >
+          Scriptify turns your ideas into working job scripts – effortlessly.
         </Typography>
 
-        <Grid container spacing={6}>
-          <Grid item xs={12} md={4} textAlign="center">
-            <Bolt sx={{ fontSize: 60, color: "primary.main" }} />
-            <Typography variant="h5" mt={2} gutterBottom>
-              Step 1: Choose
-            </Typography>
-            <Typography color="text.secondary">
-              Pick an action like sending an email or tracking job posts.
-            </Typography>
+        <Grid container spacing={4}>
+          <Grid item xs={12} md={4}>
+            <Paper
+              sx={{
+                p: 4,
+                textAlign: "center",
+                borderRadius: 4,
+                backgroundColor: "#1e1e1e",
+                boxShadow: "0 0 10px rgba(156, 39, 176, 0.3)",
+              }}
+            >
+              <Bolt sx={{ fontSize: 50, color: "#9c27b0" }} />
+              <Typography variant="h5" mt={2} gutterBottom>
+                Step 1: Choose
+              </Typography>
+              <Typography color="gray">
+                Select an action like tracking job posts or sending emails.
+              </Typography>
+            </Paper>
           </Grid>
 
-          <Grid item xs={12} md={4} textAlign="center">
-            <Edit sx={{ fontSize: 60, color: "secondary.main" }} />
-            <Typography variant="h5" mt={2} gutterBottom>
-              Step 2: Customize
-            </Typography>
-            <Typography color="text.secondary">
-              Fill in a simple form with your preferences – no coding needed.
-            </Typography>
+          <Grid item xs={12} md={4}>
+            <Paper
+              sx={{
+                p: 4,
+                textAlign: "center",
+                borderRadius: 4,
+                backgroundColor: "#1e1e1e",
+                boxShadow: "0 0 10px rgba(156, 39, 176, 0.3)",
+              }}
+            >
+              <Edit sx={{ fontSize: 50, color: "#f50057" }} />
+              <Typography variant="h5" mt={2} gutterBottom>
+                Step 2: Customize
+              </Typography>
+              <Typography color="gray">
+                Fill in a smart chat form with your preferences – no coding needed.
+              </Typography>
+            </Paper>
           </Grid>
 
-          <Grid item xs={12} md={4} textAlign="center">
-            <Download sx={{ fontSize: 60, color: "primary.main" }} />
-            <Typography variant="h5" mt={2} gutterBottom>
-              Step 3: Download
-            </Typography>
-            <Typography color="text.secondary">
-              Instantly get a downloadable Python script, ready to run.
-            </Typography>
+          <Grid item xs={12} md={4}>
+            <Paper
+              sx={{
+                p: 4,
+                textAlign: "center",
+                borderRadius: 4,
+                backgroundColor: "#1e1e1e",
+                boxShadow: "0 0 10px rgba(156, 39, 176, 0.3)",
+              }}
+            >
+              <Download sx={{ fontSize: 50, color: "#03a9f4" }} />
+              <Typography variant="h5" mt={2} gutterBottom>
+                Step 3: Automate
+              </Typography>
+              <Typography color="gray">
+                Your script runs automatically on our servers and sends you alerts – no downloads needed.
+              </Typography>
+            </Paper>
           </Grid>
         </Grid>
       </Container>

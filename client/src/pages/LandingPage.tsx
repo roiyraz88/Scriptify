@@ -2,6 +2,8 @@ import { Box, Button, Container, Typography } from "@mui/material";
 import FadeInSection from "../components/FadeInSection";
 import { motion } from "framer-motion";
 import { Link as RouterLink } from "react-router-dom";
+import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 
 function LandingPage({
   onLoginClick,
@@ -10,6 +12,15 @@ function LandingPage({
   onLoginClick: () => void;
   onRegisterClick: () => void;
 }) {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const token = localStorage.getItem("accessToken");
+
+    if (token) {
+      navigate("/generate-script");
+    }
+  }, []);
   return (
     <Box>
       {/* Hero Section */}

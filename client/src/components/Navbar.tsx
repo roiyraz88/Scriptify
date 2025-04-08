@@ -1,5 +1,6 @@
 import { AppBar, Toolbar, Typography, Box, Button } from "@mui/material";
 import { Link as RouterLink, useNavigate } from "react-router-dom";
+import Logo from "../assets/scriptify_logo.png";
 
 function Navbar({
   onLoginClick,
@@ -21,17 +22,23 @@ function Navbar({
   return (
     <AppBar position="static" sx={{ bgcolor: "#2b2b2b" }}>
       <Toolbar sx={{ justifyContent: "space-between" }}>
-        {/* צד שמאל: לוגו ותפריט */}
         <Box display="flex" alignItems="center" gap={3}>
-          <Typography
-            variant="h6"
+          <Box
             component={RouterLink}
             to={isLoggedIn ? "/generate-script" : "/"}
-            color="inherit"
-            sx={{ textDecoration: "none" }}
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              textDecoration: "none",
+            }}
           >
-            Scriptify
-          </Typography>
+            <Box
+              component="img"
+              src={Logo}
+              alt="Scriptify Logo"
+              sx={{ height: 76, width: 76 }}
+            />
+          </Box>
 
           {isLoggedIn ? (
             <>
@@ -53,7 +60,6 @@ function Navbar({
           )}
         </Box>
 
-        {/* צד ימין: שלום + יציאה או התחברות/הרשמה */}
         <Box display="flex" alignItems="center" gap={2}>
           {isLoggedIn ? (
             <>
