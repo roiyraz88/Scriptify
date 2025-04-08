@@ -34,7 +34,7 @@ const initialSteps: Step[] = [
   },
   {
     id: "frequencyType",
-    question: "How often would you like this script to run?",
+    question: "How often would you like this script to run(and to get job suggestions😉)?",
     options: ["Every day", "Every week"],
   },
 ];
