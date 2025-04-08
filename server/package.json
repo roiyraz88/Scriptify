@@ -2,12 +2,13 @@
   "name": "server",
   "version": "1.0.0",
   "main": "server.js",
-  "scripts": {
-    "test": "jest --detectOpenHandles --forceExit",
-    "start": "node server.ts",
-    "lint": "eslint . --ext .ts",
-    "dev": "nodemon ./src/server.ts"
-  },
+ "scripts": {
+  "test": "jest --detectOpenHandles --forceExit",
+  "start": "node dist/server.js",
+  "build": "tsc",
+  "lint": "eslint . --ext .ts",
+  "dev": "nodemon ./src/server.ts"
+},
   "keywords": [],
   "author": "",
   "license": "ISC",
