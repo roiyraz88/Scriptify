@@ -19,8 +19,7 @@ export const startJobAlertRunner = () => {
       if (!shouldRun) continue;
 
       try {
-        // קריאה לראוט הפנימי שמריץ את הסקריפט בפועל
-        await axios.post("http://localhost:5000/api/scripts/run-script", {
+        await axios.post("https://scriptify-aa88.onrender.com/api/scripts/run-script", {
           email: alert.email,
           query: alert.query,
         });
