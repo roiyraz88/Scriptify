@@ -4,6 +4,7 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/authRoutes";
 import scriptRoutes from "./routes/scriptRoutes";
+import profileRoutes from "./routes/profileRoutes";
 
 dotenv.config();
 
@@ -20,5 +21,6 @@ app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/scripts", scriptRoutes);
+app.use("/api/profile", profileRoutes); 
 
 export default app;
