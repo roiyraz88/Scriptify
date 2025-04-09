@@ -4,6 +4,8 @@
   "main": "server.js",
   "scripts": {
     "test": "jest --detectOpenHandles --forceExit",
+    "testAuth": "jest --detectOpenHandles --forceExit --testPathPattern=./src/tests/auth",
+    "testUser": "jest --detectOpenHandles --forceExit --testPathPattern=./src/tests/user",
     "start": "node dist/server.js",
     "build": "tsc",
     "lint": "eslint . --ext .ts",
@@ -31,6 +33,7 @@
     "@types/express": "^5.0.1",
     "@types/jest": "^29.5.14",
     "@types/jsonwebtoken": "^9.0.9",
+    "@types/mocha": "^10.0.10",
     "@types/node": "^22.14.0",
     "@types/node-cron": "^3.0.11",
     "@types/nodemailer": "^6.4.17",

@@ -8,8 +8,9 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
-    "typeRoots": ["./src/types", "./node_modules/@types"]
+    "typeRoots": ["./src/types", "./node_modules/@types"],
+    "types": ["jest", "node"]  
   },
-  "include": ["src", "server.ts"],
-  "exclude": ["node_modules", "dist", "src/tests"]
+  "include": ["src", "server.ts", "src/tests"],  
+  "exclude": ["node_modules", "dist"]
 }

@@ -38,7 +38,7 @@ export const register = async (req: Request, res: Response) => {
           "Password must contain at least one uppercase letter, one lowercase letter, and one number",
       });
     }
-    const nameRegex = /^[a-zA-Z\s]+$/;
+    const nameRegex = /^[a-zA-Zא-ת\s]+$/;
     if (!nameRegex.test(name)) {
       return res.status(400).json({ message: "Invalid name" });
     }
@@ -57,9 +57,29 @@ export const register = async (req: Request, res: Response) => {
       scripts: [],
     });
 
+    const accessToken = generateAccessToken(newUser.id.toString());
+    const refreshToken = generateRefreshToken(newUser.id.toString());
+
+    newUser.refreshToken = refreshToken;
+    await newUser.save();
+
     return res
+      .cookie("refreshToken", refreshToken, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "strict",
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+      })
       .status(201)
-      .json({ message: "Registraition is succesful!", user: newUser });
+      .json({
+        accessToken,
+        user: {
+          _id: newUser._id,
+          email: newUser.email,
+          name: newUser.name,
+          scripts: newUser.scripts,
+        },
+      });
   } catch (err) {
     console.error(err);
     return res.status(500).json({ message: "Internal server error" });
@@ -87,28 +107,22 @@ export const login = async (req: Request, res: Response) => {
   await user.save();
 
   res
-  .cookie("refreshToken", refreshToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "none", 
-    maxAge: 7 * 24 * 60 * 60 * 1000,
-  })
-  .cookie("accessToken", accessToken, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "none", 
-    maxAge: 15 * 60 * 1000, 
-  })
-  .json({
-    message: "Login successful",
-    user: {
-      _id: user._id,
-      email: user.email,
-      name: user.name,
-      scripts: user.scripts,
-    },
-  });
-
+    .cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    })
+    .json({
+      accessToken,
+      refreshToken,
+      user: {
+        _id: user._id,
+        email: user.email,
+        name: user.name,
+        scripts: user.scripts,
+      },
+    });
 };
 
 export const refreshToken = async (req: Request, res: Response) => {
