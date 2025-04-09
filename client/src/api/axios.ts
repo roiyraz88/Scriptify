@@ -1,12 +1,8 @@
 import axios from "axios";
 
-const API = axios.create({
-  baseURL:
-    import.meta.env.MODE === "development"
-      ? "http://localhost:5000/api"
-      : "https://your-backend-name.onrender.com/api", 
-  withCredentials: true,
+const instance = axios.create({
+  baseURL: import.meta.env.VITE_API_URL,
+  withCredentials: true, 
 });
 
-
-export default API;
+export default instance;
