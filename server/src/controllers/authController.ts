@@ -87,23 +87,28 @@ export const login = async (req: Request, res: Response) => {
   await user.save();
 
   res
-    .cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    })
-    .json({
-      message: "Login successful",
-      accessToken,
-      refreshToken,
-      user: {
-        _id: user._id,
-        email: user.email,
-        name: user.name,
-        scripts: user.scripts,
-      },
-    });
+  .cookie("refreshToken", refreshToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "none", 
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  })
+  .cookie("accessToken", accessToken, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "none", 
+    maxAge: 15 * 60 * 1000, 
+  })
+  .json({
+    message: "Login successful",
+    user: {
+      _id: user._id,
+      email: user.email,
+      name: user.name,
+      scripts: user.scripts,
+    },
+  });
+
 };
 
 export const refreshToken = async (req: Request, res: Response) => {
