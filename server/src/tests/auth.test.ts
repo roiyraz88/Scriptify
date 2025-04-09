@@ -2,7 +2,6 @@ import request from "supertest";
 import app from "../app";
 import User, { IUser } from "../models/User";
 import mongoose from "mongoose";
-import { log } from "console";
 
 let testUser: IUser;
 
@@ -193,3 +192,5 @@ describe("Auth API", () => {
     expect(res.body).toHaveProperty("message", "Invalid refresh token");
   });
 });
+
+
