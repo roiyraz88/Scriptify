@@ -62,7 +62,7 @@ function HowItWorks() {
             </Paper>
           </Grid>
 
-          <Grid paddingLeft={17}>
+          <Grid width={1100}>
             <Paper sx={cardStyle}>
               <Download sx={{ fontSize: 50, color: "#03a9f4" }} />
               <Typography variant="h5" mt={2} gutterBottom>

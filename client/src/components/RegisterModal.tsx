@@ -6,7 +6,10 @@ import {
   TextField,
   Button,
   Typography,
+  IconButton,
+  InputAdornment,
 } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useState } from "react";
 import API from "../api/axios";
 import { useNavigate } from "react-router-dom";
@@ -22,10 +25,11 @@ function RegisterModal({ open, onClose, onSwitchToLogin }: RegisterModalProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [errorMessage, setErrorMessage] = useState("");
   const navigate = useNavigate();
-
 
   const handleRegister = async () => {
     try {
@@ -73,18 +77,39 @@ function RegisterModal({ open, onClose, onSwitchToLogin }: RegisterModalProps) {
         <TextField
           margin="dense"
           label="Password"
-          type="password"
+          type={showPassword ? "text" : "password"}
           fullWidth
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={() => setShowPassword((prev) => !prev)}>
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
         />
+
         <TextField
           margin="dense"
           label="Confirm Password"
-          type="password"
+          type={showConfirmPassword ? "text" : "password"}
           fullWidth
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  onClick={() => setShowConfirmPassword((prev) => !prev)}
+                >
+                  {showConfirmPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
         />
 
         {errorMessage && (

@@ -6,7 +6,10 @@ import {
   DialogActions,
   Button,
   Typography,
+  IconButton,
+  InputAdornment,
 } from "@mui/material";
+import { Visibility, VisibilityOff } from "@mui/icons-material";
 import { useState } from "react";
 import API from "../api/axios";
 import { useNavigate } from "react-router-dom";
@@ -21,6 +24,13 @@ function LoginModal({ open, onClose, onSwitchToRegister }: LoginModalProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const handleClickShowPassword = () => setShowPassword((prev) => !prev);
+  const handleMouseDownPassword = (
+    event: React.MouseEvent<HTMLButtonElement>
+  ) => {
+    event.preventDefault();
+  };
 
   const navigate = useNavigate();
 
@@ -61,11 +71,25 @@ function LoginModal({ open, onClose, onSwitchToRegister }: LoginModalProps) {
         <TextField
           margin="dense"
           label="Password"
-          type="password"
+          type={showPassword ? "text" : "password"}
           fullWidth
           variant="outlined"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label="toggle password visibility"
+                  onClick={handleClickShowPassword}
+                  onMouseDown={handleMouseDownPassword}
+                  edge="end"
+                >
+                  {showPassword ? <VisibilityOff /> : <Visibility />}
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
         />
 
         <Typography variant="body2" sx={{ mt: 2 }}>
