@@ -19,7 +19,7 @@ export const startJobAlertRunner = () => {
       if (!shouldRun) continue;
 
       try {
-        await axios.post("https://scriptify-aa88.onrender.com/api/scripts/run-script", {
+        await axios.post("https://scriptify-backend.vercel.app//scripts/run-script", {
           email: alert.email,
           query: alert.query,
         });

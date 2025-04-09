@@ -25,7 +25,7 @@ afterAll(async () => {
 
 describe("Auth API", () => {
   test("should register a new user", async () => {
-    const res = await request(app).post("/api/auth/register").send({
+    const res = await request(app).post("/auth/register").send({
       name: testUser.name,
       email: testUser.email,
       password: testUser.password,
@@ -39,7 +39,7 @@ describe("Auth API", () => {
   });
 
   test("should not register a user with an existing email", async () => {
-    const res = await request(app).post("/api/auth/register").send({
+    const res = await request(app).post("/auth/register").send({
       name: "Another User",
       email: testUser.email, // Use the same email as the test user
       password: "12345678",
@@ -50,7 +50,7 @@ describe("Auth API", () => {
   });
 
   test("should not register a user with invalid email", async () => {
-    const res = await request(app).post("/api/auth/register").send({
+    const res = await request(app).post("/auth/register").send({
       name: "Invalid User",
       email: "invalid-email",
       password: "User1234",
@@ -61,7 +61,7 @@ describe("Auth API", () => {
   });
 
   test("should not register a user with short password", async () => {
-    const res = await request(app).post("/api/auth/register").send({
+    const res = await request(app).post("/auth/register").send({
       name: "Short Password User",
       email: "testuser2@gmail.com",
       password: "123",
@@ -75,7 +75,7 @@ describe("Auth API", () => {
   });
 
   test("should not register a user with non-matching passwords", async () => {
-    const res = await request(app).post("/api/auth/register").send({
+    const res = await request(app).post("/auth/register").send({
       name: "Non-matching Password User",
       email: "testuser2@gmail.com",
       password: "User1234",
@@ -85,7 +85,7 @@ describe("Auth API", () => {
     expect(res.body).toHaveProperty("message", "Passwords do not match");
   });
   test("login user", async () => {
-    const res = await request(app).post("/api/auth/login").send({
+    const res = await request(app).post("/auth/login").send({
       email: testUser.email,
       password: testUser.password,
     });
@@ -94,7 +94,7 @@ describe("Auth API", () => {
     expect(res.body.user).toHaveProperty("email", testUser.email);
   });
   test("should not login with incorrect password", async () => {
-    const res = await request(app).post("/api/auth/login").send({
+    const res = await request(app).post("/auth/login").send({
       email: testUser.email,
       password: "wrongpassword",
     });
@@ -105,7 +105,7 @@ describe("Auth API", () => {
     );
   });
   test("should not login with unregistered email", async () => {
-    const res = await request(app).post("/api/auth/login").send({
+    const res = await request(app).post("/auth/login").send({
       email: "unregistered@gmail.com",
       password: testUser.password,
     });
@@ -113,7 +113,7 @@ describe("Auth API", () => {
     expect(res.body).toHaveProperty("message", "Email not found");
   });
   test("should not login with empty fields", async () => {
-    const res = await request(app).post("/api/auth/login").send({
+    const res = await request(app).post("/auth/login").send({
       email: "",
       password: "",
     });
@@ -121,7 +121,7 @@ describe("Auth API", () => {
     expect(res.body).toHaveProperty("message", "Please fill all fields");
   });
   test("should refresh access token with valid refresh token cookie", async () => {
-    const loginRes = await request(app).post("/api/auth/login").send({
+    const loginRes = await request(app).post("/auth/login").send({
       email: testUser.email,
       password: testUser.password,
     });
@@ -134,7 +134,7 @@ describe("Auth API", () => {
     const cookie = `refreshToken=${refreshToken}`;
 
     const refreshRes = await request(app)
-      .post("/api/auth/refresh")
+      .post("/auth/refresh")
       .set("Cookie", cookie);
 
     expect(refreshRes.statusCode).toBe(200);
@@ -143,7 +143,7 @@ describe("Auth API", () => {
   });
 
   test("should not refresh token when no cookie is sent", async () => {
-    const res = await request(app).post("/api/auth/refresh"); 
+    const res = await request(app).post("/auth/refresh"); 
 
     expect(res.statusCode).toBe(401);
     expect(res.body).toHaveProperty("message", "Refresh token is not valid");
@@ -151,7 +151,7 @@ describe("Auth API", () => {
 
   test("should not refresh token with invalid token", async () => {
     const res = await request(app)
-      .post("/api/auth/refresh")
+      .post("/auth/refresh")
       .set("Cookie", ["refreshToken=invalidtoken"])
       .send({
         email: testUser.email,
@@ -160,7 +160,7 @@ describe("Auth API", () => {
     expect(res.body).toHaveProperty("message", "Invalid refresh token");
   });
   test("logout user", async () => {
-    const res = await request(app).post("/api/auth/login").send({
+    const res = await request(app).post("/auth/login").send({
       email: testUser.email,
       password: testUser.password,
     });
@@ -170,14 +170,14 @@ describe("Auth API", () => {
     expect(res.body).toHaveProperty("refreshToken");
 
     const logoutRes = await request(app)
-      .post("/api/auth/logout")
+      .post("/auth/logout")
       .set("Cookie", [`refreshToken=${res.body.refreshToken}`])
       .send({});
     expect(logoutRes.statusCode).toBe(200);
     expect(logoutRes.body).toHaveProperty("message", "Logged out successfully");
   });
   test("should not logout without refresh token", async () => {
-    const res = await request(app).post("/api/auth/logout").send({});
+    const res = await request(app).post("/auth/logout").send({});
     expect(res.statusCode).toBe(400);
     expect(res.body).toHaveProperty(
       "message",
@@ -186,7 +186,7 @@ describe("Auth API", () => {
   });
   test("should not logout with invalid refresh token", async () => {
     const res = await request(app)
-      .post("/api/auth/logout")
+      .post("/auth/logout")
       .set("Cookie", ["refreshToken=invalidtoken"])
       .send({});
     expect(res.statusCode).toBe(401);
