@@ -31,8 +31,8 @@ app.get("/", (req, res) => {
 });
 
 
-app.use("/api/auth", authRoutes);
-app.use("/api/scripts", scriptRoutes);
-app.use("/api/profile", profileRoutes); 
+app.use("/auth", authRoutes);
+app.use("/scripts", scriptRoutes);
+app.use("/profile", profileRoutes); 
 
 export default app;
