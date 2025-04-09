@@ -31,6 +31,11 @@ app.use(
 app.use(express.json());
 app.use(cookieParser());
 
+app.get("/", (req, res) => {
+  res.send("Hello, default gateway!");
+});
+
+
 app.use("/api/auth", authRoutes);
 app.use("/api/scripts", scriptRoutes);
 app.use("/api/profile", profileRoutes); 
