@@ -17,7 +17,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: 'https://scriptify-two-blue.vercel.app/',
+    origin: 'https://scriptify-two-blue.vercel.app',
     credentials: true,
   })
 );
