@@ -1,51 +1,102 @@
-### 1. הרשמה של משתמש חדש
-POST http://localhost:5000/api/auth/register
+### 🔐 רישום משתמש חדש
+POST http://localhost:5000/auth/register
 Content-Type: application/json
 
 {
   "name": "Test User",
-  "email": "test2@example.com",
-  "password": "User123",
-  "confirmPassword": "User123"
+  "email": "test_user@example.com",
+  "password": "User1234",
+  "confirmPassword": "User1234"
 }
 
 ###
 
-### 2. התחברות וקבלת access + refresh token
-POST http://localhost:5000/api/auth/login
+### 🔐 התחברות וקבלת Access Token
+POST http://localhost:5000/auth/login
 Content-Type: application/json
 
 {
-  "email": "test2@example.com",
-  "password": "User123"
+  "email": "test_user@example.com",
+  "password": "User1234"
 }
 
 ###
 
-### 3. קבלת access token חדש לפי refresh token (נשלח מה-cookie)
-GET http://localhost:5000/api/auth/refresh
+### 🧠 יצירת סקריפט Email Automation עם AI
+POST http://localhost:5000/scripts/generate
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2ZhNWMyY2FlNWE1MjM1ZGEyMzNkZmUiLCJpYXQiOjE3NDQ0NjIzNDgsImV4cCI6MTc0NDQ2MzI0OH0.dwjUAgE3vNyjtNREnfZWlhyXSR9PsGWc9GCFdrI-HeI
 Content-Type: application/json
 
 {
-    "refreshToken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2VmZDhkNTcyYTU5OTVhYzA1Nzg2MzciLCJpYXQiOjE3NDM3NzI5ODEsImV4cCI6MTc0NDM3Nzc4MX0.YS25KMr9XJx4vHFdRGxPqpw5HoNX6uXS4xZVOB7Hzeo"
+  "category": "email_automation",
+  "prompt": "Write a Python script that sends a welcome email using smtplib"
 }
 
 ###
 
-### 4. התנתקות – מחיקת refresh token מה-DB ומה-cookie
-POST http://localhost:5000/api/auth/logout
-
-###
-
-### יצירת סקריפט job-alert חדש
-POST http://localhost:5000/api/scripts/generate-job-alert
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2YwZmM1Nzk1YjM1NmZmMTBiZjMxZTQiLCJpYXQiOjE3NDM4NDY1MTIsImV4cCI6MTc0Mzg0NzQxMn0.c5jlhs4WOOz6JpCp_je_WI6D25TBCHnF0YAOR1Ytxno
+### 🔗 יצירת סקריפט API Integration עם AI
+POST http://localhost:5000/scripts/generate
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2ZhNWMyY2FlNWE1MjM1ZGEyMzNkZmUiLCJpYXQiOjE3NDQ0NjMzNzgsImV4cCI6MTc0NDQ2NDI3OH0.WXwBpmrfNxVCnwju8JCDP-43G40c1G_VuVOMRepVYlI
 Content-Type: application/json
 
 {
-  "serpApiKey": "9a0bbc760bc361ad3e18040140ee489492f4ac6b2c4deb48d265785f520061af",
-  "emailSender": "roiyraz88@gmail.com",
-  "emailPassword": "gkug zzma ihjn tumt",
+  "category": "api_integration",
+  "prompt": "Write a script that fetches weather data from OpenWeatherMap API"
+}
+
+###
+
+### 🕷️ יצירת סקריפט Web Scraping
+POST http://localhost:5000/scripts/generate
+Authorization: Bearer PASTE_ACCESS_TOKEN_HERE
+Content-Type: application/json
+
+{
+  "category": "web_scraping",
+  "prompt": "Scrape the latest article titles from TechCrunch homepage"
+}
+
+###
+
+### 🗃️ יצירת סקריפט File Handling
+POST http://localhost:5000/scripts/generate
+Authorization: Bearer PASTE_ACCESS_TOKEN_HERE
+Content-Type: application/json
+
+{
+  "category": "file_handling",
+  "prompt": "Write a script that reads all .txt files in a folder and merges them into one .csv file"
+}
+
+###
+
+### 🎯 יצירת סקריפט Job Alert עם תזמון יומי
+POST http://localhost:5000/scripts/generate
+Authorization: Bearer PASTE_ACCESS_TOKEN_HERE
+Content-Type: application/json
+
+{
+  "category": "job_alerts",
+  "query": "QA engineer site:comeet.com",
+  "emailRecipient": "your_email@example.com",
+  "resultLimit": 5,
+  "frequencyType": "Every day",
+  "executionTime": "10:00"
+}
+
+###
+
+### 🎯 יצירת סקריפט Job Alert עם תזמון שבועי
+POST http://localhost:5000/scripts/generate
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiI2N2ZhNWMyY2FlNWE1MjM1ZGEyMzNkZmUiLCJpYXQiOjE3NDQ0NjQ2NjgsImV4cCI6MTc0NDQ2NTU2OH0.t0ORcNn4lCzyiNVjLyG53NgwIjfw1CXAJOOVKk9YQhA
+Content-Type: application/json
+
+{
+  "category": "job_alerts",
+  "query": "Junior developer site:glassdoor.com",
   "emailRecipient": "roiyraz88@gmail.com",
-  "query": "site:comeet.com/jobs junior"
+  "resultLimit": 5,
+  "frequencyType": "Every week",
+  "weeklyDay": "Monday",
+  "executionTime": "09:00"
 }

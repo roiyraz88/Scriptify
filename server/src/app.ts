@@ -11,8 +11,13 @@ dotenv.config();
 
 const app = express();
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://scriptify-two-blue.vercel.app",
+];
+
 app.use(cors({
-  origin: ["https://scriptify-two-blue.vercel.app"], 
+  origin: allowedOrigins,
   credentials: true,
 }));
 

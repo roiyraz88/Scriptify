@@ -9,8 +9,8 @@
     "resolveJsonModule": true,
     "forceConsistentCasingInFileNames": true,
     "typeRoots": ["./src/types", "./node_modules/@types"],
-    "types": ["jest", "node"]  
+    "types": ["jest", "node"]
   },
-  "include": ["src", "server.ts", "src/tests"],  
+  "include": ["src", "server.ts", "src/types/index.d.ts", "src/jobs"],
   "exclude": ["node_modules", "dist"]
 }

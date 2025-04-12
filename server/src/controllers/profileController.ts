@@ -3,7 +3,7 @@ import Script from "../models/Script";
 
 export const getMyScripts = async (req: Request, res: Response) => {
   try {
-    const scripts = await Script.find({ owner: req.userId }).sort({
+    const scripts = await Script.find({ owner: (req as any).userId }).sort({
       createdAt: -1,
     });
     res.status(200).json({ scripts });
@@ -14,7 +14,7 @@ export const getMyScripts = async (req: Request, res: Response) => {
 
 export const deleteScript = async (req: Request, res: Response) => {
   const scriptId = req.params.id;
-  const userId = req.userId;
+  const userId = (req as any).userId;
 
   try {
     const script = await Script.findOneAndDelete({
@@ -35,7 +35,7 @@ export const deleteScript = async (req: Request, res: Response) => {
 
 export const updateScript = async (req: Request, res: Response) => {
   const scriptId = req.params.id;
-  const userId = req.userId;
+  const userId = (req as any).userId;
   const {
     query,
     resultLimit,
