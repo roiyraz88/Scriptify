@@ -16,7 +16,7 @@ export const requireAuth: RequestHandler = (req, res, next) => {
       userId: string;
     };
 
-    req.userId = decoded.userId;
+    (req as any).userId = decoded.userId;
 
     next();
   } catch (err) {

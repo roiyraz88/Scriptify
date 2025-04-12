@@ -6,6 +6,7 @@
     "test": "jest --detectOpenHandles --forceExit",
     "testAuth": "jest --detectOpenHandles --forceExit --testPathPattern=./src/tests/auth",
     "testUser": "jest --detectOpenHandles --forceExit --testPathPattern=./src/tests/user",
+    "testAiScript": "jest --detectOpenHandles --forceExit --testPathPattern=./src/tests/script-ai",
     "start": "node dist/server.js",
     "build": "tsc",
     "lint": "eslint . --ext .ts",
@@ -15,6 +16,8 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@google/generative-ai": "^0.24.0",
+    "agenda": "^5.0.0",
     "axios": "^1.8.4",
     "bcrypt": "^5.1.1",
     "cookie-parser": "^1.4.7",
