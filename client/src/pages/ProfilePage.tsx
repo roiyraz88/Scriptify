@@ -27,6 +27,7 @@ interface Script {
   dailyTime?: string;
   weeklyDay?: string;
   weeklyTime?: string;
+  customization?: string;
   createdAt: string;
 }
 
@@ -68,7 +69,7 @@ function ProfilePage() {
     try {
       const token = localStorage.getItem("accessToken");
 
-      // Enhance query to limit results to job postings only
+      // חיזוק השאילתה לשימוש באתרים רלוונטיים בלבד
       const updatedQuery = `site:linkedin.com/jobs OR site:glassdoor.com OR site:indeed.com "${editData.query}"`;
 
       const res = await API.put(
@@ -91,8 +92,19 @@ function ProfilePage() {
     fetchScripts();
   }, []);
 
-  const hourOptions = Array.from({ length: 24 }, (_, i) => `${i.toString().padStart(2, "0")}:00`);
-  const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
+  const hourOptions = Array.from(
+    { length: 24 },
+    (_, i) => `${i.toString().padStart(2, "0")}:00`
+  );
+  const days = [
+    "Sunday",
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+  ];
 
   return (
     <Container sx={{ py: 4 }}>
@@ -120,18 +132,56 @@ function ProfilePage() {
               boxShadow: "0 0 10px rgba(156, 39, 176, 0.2)",
             }}
           >
-            <Box display="flex" justifyContent="space-between" alignItems="center">
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+            >
               <Box>
-                <Typography sx={{ color: "#fff" }}><strong>🔍 Query:</strong> {script.query}</Typography>
-                <Typography sx={{ color: "#fff" }}><strong>📬 Results:</strong> {script.resultLimit}</Typography>
-                <Typography sx={{ color: "#fff" }}><strong>⏰ Frequency:</strong> {script.frequencyType}</Typography>
-                {script.dailyTime && <Typography sx={{ color: "#fff" }}><strong>🕐 Time:</strong> {script.dailyTime}</Typography>}
-                {script.weeklyDay && <Typography sx={{ color: "#fff" }}><strong>📅 Day:</strong> {script.weeklyDay}</Typography>}
-                {script.weeklyTime && <Typography sx={{ color: "#fff" }}><strong>🕐 Time:</strong> {script.weeklyTime}</Typography>}
+                <Typography sx={{ color: "#fff" }}>
+                  <strong>🔍 Query:</strong> {script.query}
+                </Typography>
+
+                {script.customization && (
+                  <Typography sx={{ color: "#fff" }}>
+                    <strong>🧩 Customization:</strong> {script.customization}
+                  </Typography>
+                )}
+
+                <Typography sx={{ color: "#fff" }}>
+                  <strong>📬 Result Limit:</strong> {script.resultLimit}
+                </Typography>
+
+                <Typography sx={{ color: "#fff" }}>
+                  <strong>⏰ Frequency:</strong> {script.frequencyType}
+                </Typography>
+
+                {script.frequencyType === "Every day" && script.dailyTime && (
+                  <Typography sx={{ color: "#fff" }}>
+                    <strong>🕐 Time:</strong> {script.dailyTime}
+                  </Typography>
+                )}
+
+                {script.frequencyType === "Every week" && (
+                  <>
+                    {script.weeklyDay && (
+                      <Typography sx={{ color: "#fff" }}>
+                        <strong>📅 Day:</strong> {script.weeklyDay}
+                      </Typography>
+                    )}
+                    {script.weeklyTime && (
+                      <Typography sx={{ color: "#fff" }}>
+                        <strong>🕐 Time:</strong> {script.weeklyTime}
+                      </Typography>
+                    )}
+                  </>
+                )}
+
                 <Typography variant="caption" sx={{ color: "#aaa" }}>
                   Created: {new Date(script.createdAt).toLocaleString()}
                 </Typography>
               </Box>
+
               <Box display="flex" gap={1}>
                 <IconButton
                   color="info"
@@ -159,9 +209,13 @@ function ProfilePage() {
       )}
 
       <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
-        <DialogTitle>❗ Are you sure you want to delete this script?</DialogTitle>
+        <DialogTitle>
+          ❗ Are you sure you want to delete this script?
+        </DialogTitle>
         <DialogActions>
-          <Button onClick={() => setConfirmOpen(false)} color="inherit">Cancel</Button>
+          <Button onClick={() => setConfirmOpen(false)} color="inherit">
+            Cancel
+          </Button>
           <Button
             onClick={() => {
               if (selectedScriptId) {
@@ -179,28 +233,63 @@ function ProfilePage() {
 
       <Dialog open={editOpen} onClose={() => setEditOpen(false)}>
         <DialogTitle>Edit Script</DialogTitle>
-        <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2, mt: 1 }}>
+        <DialogContent
+          sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}
+        >
           <TextField
             label="Query"
             value={editData.query || ""}
-            onChange={(e) => setEditData({ ...editData, query: e.target.value })}
+            onChange={(e) =>
+              setEditData({ ...editData, query: e.target.value })
+            }
           />
           <TextField
             label="Result Limit"
             type="number"
             inputProps={{ min: 1, max: 20 }}
             value={editData.resultLimit || 10}
-            onChange={(e) => setEditData({ ...editData, resultLimit: +e.target.value })}
+            onChange={(e) =>
+              setEditData({ ...editData, resultLimit: +e.target.value })
+            }
           />
+          <TextField
+            select
+            label="Frequency"
+            value={editData.frequencyType || ""}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (value === "Every day") {
+                setEditData({
+                  ...editData,
+                  frequencyType: value,
+                  weeklyDay: "",
+                  weeklyTime: "",
+                });
+              } else {
+                setEditData({
+                  ...editData,
+                  frequencyType: value,
+                  dailyTime: "",
+                });
+              }
+            }}
+          >
+            <MenuItem value="Every day">Every day</MenuItem>
+            <MenuItem value="Every week">Every week</MenuItem>
+          </TextField>
           {editData.frequencyType === "Every day" && (
             <TextField
               select
               label="Daily Time"
               value={editData.dailyTime || ""}
-              onChange={(e) => setEditData({ ...editData, dailyTime: e.target.value })}
+              onChange={(e) =>
+                setEditData({ ...editData, dailyTime: e.target.value })
+              }
             >
               {hourOptions.map((hour) => (
-                <MenuItem key={hour} value={hour}>{hour}</MenuItem>
+                <MenuItem key={hour} value={hour}>
+                  {hour}
+                </MenuItem>
               ))}
             </TextField>
           )}
@@ -210,24 +299,41 @@ function ProfilePage() {
                 select
                 label="Weekly Day"
                 value={editData.weeklyDay || ""}
-                onChange={(e) => setEditData({ ...editData, weeklyDay: e.target.value })}
+                onChange={(e) =>
+                  setEditData({ ...editData, weeklyDay: e.target.value })
+                }
               >
                 {days.map((day) => (
-                  <MenuItem key={day} value={day}>{day}</MenuItem>
+                  <MenuItem key={day} value={day}>
+                    {day}
+                  </MenuItem>
                 ))}
               </TextField>
               <TextField
                 select
                 label="Weekly Time"
                 value={editData.weeklyTime || ""}
-                onChange={(e) => setEditData({ ...editData, weeklyTime: e.target.value })}
+                onChange={(e) =>
+                  setEditData({ ...editData, weeklyTime: e.target.value })
+                }
               >
                 {hourOptions.map((hour) => (
-                  <MenuItem key={hour} value={hour}>{hour}</MenuItem>
+                  <MenuItem key={hour} value={hour}>
+                    {hour}
+                  </MenuItem>
                 ))}
               </TextField>
             </>
           )}
+          <TextField
+            label="Customization"
+            multiline
+            rows={2}
+            value={editData.customization || ""}
+            onChange={(e) =>
+              setEditData({ ...editData, customization: e.target.value })
+            }
+          />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setEditOpen(false)}>Cancel</Button>

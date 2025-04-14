@@ -44,7 +44,6 @@ function LoginModal({ open, onClose, onSwitchToRegister }: LoginModalProps) {
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("user", JSON.stringify(user));
 
-      console.log("Logged in!", user);
       setErrorMessage(""); // אפס שגיאות
       onClose();
       navigate("/generate-script");

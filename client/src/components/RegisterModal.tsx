@@ -43,7 +43,6 @@ function RegisterModal({ open, onClose, onSwitchToLogin }: RegisterModalProps) {
       const { accessToken, user } = res.data;
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("user", JSON.stringify(user));
-      console.log("Registered successfully:", user);
       onClose();
       setErrorMessage("");
       navigate("/generate-script"); // ניתוב לעמוד הרצוי

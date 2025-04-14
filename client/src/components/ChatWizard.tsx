@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import {
   Box,
   Typography,
@@ -7,9 +7,10 @@ import {
   Fade,
   Avatar,
   MenuItem,
+  CircularProgress,
 } from "@mui/material";
 
-type Step =
+type StepType =
   | { id: "email"; question: string }
   | { id: "query"; question: string }
   | { id: "resultLimit"; question: string }
@@ -17,9 +18,10 @@ type Step =
   | { id: "dailyTime"; question: string; options: string[] }
   | { id: "weeklyDay"; question: string; options: string[] }
   | { id: "weeklyTime"; question: string; options: string[] }
+  | { id: "customization"; question: string }
   | { id: "done" };
 
-const initialSteps: Step[] = [
+const initialSteps: StepType[] = [
   {
     id: "email",
     question: "To which email address should we send job alerts?",
@@ -34,10 +36,27 @@ const initialSteps: Step[] = [
   },
   {
     id: "frequencyType",
-    question: "How often would you like this script to run(and to get job suggestions😉)?",
+    question: "How often would you like this script to run?",
     options: ["Every day", "Every week"],
   },
+  {
+    id: "customization",
+    question: "Any custom filters? (e.g., Only full-time jobs in Tel Aviv)",
+  },
 ];
+
+const stepHints: Record<string, string> = {
+  email:
+    "📧 Please enter a valid email address where you'd like to receive job alerts.",
+  query: "💼 Use keywords like 'junior frontend developer' or 'QA Tel Aviv'.",
+  resultLimit: "🔢 Choose how many job results you want (1 to 20).",
+  frequencyType: "⏱️ Decide how often the script should run: daily or weekly.",
+  dailyTime: "🕒 Choose the hour the script should run every day.",
+  weeklyDay: "📅 Select the day of the week to run the job alert.",
+  weeklyTime: "🕒 What time on that day should the alert run?",
+  customization:
+    "🛠️ Add filters like location, job type or seniority (e.g. 'only remote jobs in Israel').",
+};
 
 const isValidEmail = (email: string): boolean =>
   /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -52,23 +71,19 @@ function ChatWizard({
 }: {
   onComplete?: (answers: Record<string, string>) => void;
 }) {
-  const [steps, setSteps] = useState<Step[]>(initialSteps);
+  const [steps, setSteps] = useState<StepType[]>(initialSteps);
   const [currentStepIndex, setCurrentStepIndex] = useState(0);
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [inputValue, setInputValue] = useState("");
   const [hasChosenOption, setHasChosenOption] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
   const currentStep = steps[currentStepIndex];
-
-  useEffect(() => {
-    if (currentStep.id === "done" && onComplete) {
-      onComplete(answers);
-    }
-  }, [currentStep.id]);
+  if (!currentStep) return null;
 
   const handleNext = (answer: string) => {
-    setErrorMessage(""); // ננקה שגיאה ישנה
+    setErrorMessage("");
 
     if (currentStep.id === "email" && !isValidEmail(answer)) {
       setErrorMessage("❌ Please enter a valid email address.");
@@ -80,54 +95,53 @@ function ChatWizard({
       return;
     }
 
-    const stepId = currentStep.id;
-    const newAnswers = { ...answers, [stepId]: answer };
-    let newSteps = [...steps];
+    const newAnswers = { ...answers, [currentStep.id]: answer };
+    const newSteps = steps.slice(0, currentStepIndex + 1);
 
     const hourOptions = Array.from(
       { length: 24 },
       (_, i) => `${i.toString().padStart(2, "0")}:00`
     );
 
-    if (stepId === "frequencyType") {
+    // בשלב frequencyType בתוך handleNext (שורה 76 בערך):
+    if (currentStep.id === "frequencyType") {
+      const customizationStep = steps.find((s) => s.id === "customization");
+
       if (answer === "Every day") {
-        newSteps = [
-          ...steps.slice(0, currentStepIndex + 1),
-          {
-            id: "dailyTime",
-            question: "At what hour should the script run every day?",
-            options: hourOptions,
-          },
-          { id: "done" },
-        ];
+        newSteps.push({
+          id: "dailyTime",
+          question: "At what hour should the script run every day?",
+          options: hourOptions,
+        });
+        if (customizationStep) newSteps.push(customizationStep);
+        newSteps.push({ id: "done" });
       } else if (answer === "Every week") {
-        newSteps = [
-          ...steps.slice(0, currentStepIndex + 1),
-          {
-            id: "weeklyDay",
-            question: "On which day of the week should it run?",
-            options: [
-              "Sunday",
-              "Monday",
-              "Tuesday",
-              "Wednesday",
-              "Thursday",
-              "Friday",
-              "Saturday",
-            ],
-          },
-          {
-            id: "weeklyTime",
-            question: "At what hour on that day should the script run?",
-            options: hourOptions,
-          },
-          { id: "done" },
-        ];
+        newSteps.push({
+          id: "weeklyDay",
+          question: "On which day of the week should it run?",
+          options: [
+            "Sunday",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday",
+          ],
+        });
+        newSteps.push({
+          id: "weeklyTime",
+          question: "At what hour on that day should the script run?",
+          options: hourOptions,
+        });
+        if (customizationStep) newSteps.push(customizationStep);
+        newSteps.push({ id: "done" });
       }
+
+      setSteps(newSteps);
     }
 
     setAnswers(newAnswers);
-    setSteps(newSteps);
     setCurrentStepIndex((prev) => prev + 1);
     setInputValue("");
     setHasChosenOption(false);
@@ -150,7 +164,7 @@ function ChatWizard({
             {step.id !== "done" && (
               <Box display="flex" alignItems="flex-start" gap={1}>
                 <Avatar sx={{ bgcolor: "primary.main", fontSize: 10 }}>
-                  Scriptify
+                  S
                 </Avatar>
                 <Box
                   bgcolor="#333"
@@ -226,7 +240,11 @@ function ChatWizard({
                   </Button>
                 ))
               )}
-
+              {stepHints[currentStep.id] && (
+                <Typography variant="caption" color="textSecondary">
+                  {stepHints[currentStep.id]}
+                </Typography>
+              )}
               {hasChosenOption && (
                 <Button
                   variant="contained"
@@ -234,24 +252,33 @@ function ChatWizard({
                   sx={{ mt: 2 }}
                   onClick={() => handleNext(answers[currentStep.id])}
                 >
-                  {currentStepIndex === steps.length - 2
-                    ? "Generate Script"
-                    : "Next"}
+                  Next
                 </Button>
               )}
             </>
           ) : (
-            <TextField
-              fullWidth
-              placeholder="Type your answer..."
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter" && inputValue.trim()) {
-                  handleNext(inputValue.trim());
+            <>
+              <TextField
+                fullWidth
+                placeholder={
+                  currentStep.id === "customization"
+                    ? "e.g. Only remote jobs in Tel Aviv"
+                    : "Type your answer..."
                 }
-              }}
-            />
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" && inputValue.trim()) {
+                    handleNext(inputValue.trim());
+                  }
+                }}
+              />
+              {stepHints[currentStep.id] && (
+                <Typography variant="caption" color="textSecondary">
+                  {stepHints[currentStep.id]}
+                </Typography>
+              )}
+            </>
           )}
 
           {errorMessage && (
@@ -268,11 +295,40 @@ function ChatWizard({
         </Box>
       )}
 
-      {currentStep.id === "done" && (
-        <Box mt={4}>
-          <Typography variant="h6" align="center">
-            🎉 Done! Your script is being generated...
+      {loading && (
+        <Box
+          sx={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            width: "100vw",
+            height: "100vh",
+            bgcolor: "rgba(0,0,0,0.5)",
+            zIndex: 9999,
+            display: "flex",
+            justifyContent: "center",
+            alignItems: "center",
+          }}
+        >
+          <CircularProgress size={60} thickness={5} />
+        </Box>
+      )}
+
+      {currentStep.id === "done" && !loading && (
+        <Box mt={4} textAlign="center">
+          <Typography variant="h6" mb={2}>
+            🎉 All set! Ready to generate your script?
           </Typography>
+          <Button
+            variant="contained"
+            color="success"
+            onClick={() => {
+              setLoading(true);
+              onComplete?.(answers);
+            }}
+          >
+            Generate Script
+          </Button>
         </Box>
       )}
     </Box>

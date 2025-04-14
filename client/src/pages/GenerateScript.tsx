@@ -8,54 +8,82 @@ import {
   Alert,
   Box,
   Button,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogContentText,
+  DialogActions,
 } from "@mui/material";
 
 function GenerateScriptPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
+  const [showIntroModal, setShowIntroModal] = useState(true);
 
-  const handleComplete = async (answers: Record<string, string>) => {
+  const token = localStorage.getItem("accessToken");
+
+  const handleJobAlertSubmit = async (answers: Record<string, string>) => {
+    if (!token) {
+      setError("❌ You must be logged in to generate a script.");
+      return;
+    }
     try {
       setLoading(true);
       setError("");
-  
-      const token = localStorage.getItem("accessToken");
-  
+
       const payload = {
+        category: "job_alerts",
         emailRecipient: answers.email,
         query: answers.query,
         resultLimit: answers.resultLimit,
         frequencyType: answers.frequencyType,
-        dailyTime: answers.dailyTime, // אם Every day
-        weeklyDay: answers.weeklyDay, // אם Every week
-        weeklyTime: answers.weeklyTime, // אם Every week
+        executionTime: answers.dailyTime || answers.weeklyTime,
+        weeklyDay: answers.weeklyDay,
+        customization: answers.customization || "",
       };
-  
-      console.log("📦 Sending payload:", payload);
-  
-      const res = await API.post("/scripts/run-script", payload, {
+
+      const res = await API.post("/scripts/generate", payload, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-  
+
       setSuccess(true);
-      console.log("✅ Script ran successfully:", res.data);
     } catch (err) {
-      setError("❌ Failed to run the script.");
+      setError("❌ Failed to generate job alert script.");
       console.error(err);
     } finally {
       setLoading(false);
     }
   };
-  
 
   return (
     <Container sx={{ py: 4 }}>
       <Typography variant="h4" gutterBottom>
-        Generate Your Job Alert Script:
+        Generate Your Custom Script
       </Typography>
+
+      <Dialog open={showIntroModal} onClose={() => setShowIntroModal(false)}>
+        <DialogTitle>👋 Welcome to Scriptify</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            This short chat will help you generate a custom job alert script.
+            You'll answer a few simple questions about your preferences — like
+            the keywords you're searching for, how often you want the script to
+            run, and where you'd like to get alerts.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            onClick={() => setShowIntroModal(false)}
+            autoFocus
+            variant="contained"
+          >
+            Let's Get Started
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {loading && <CircularProgress sx={{ mt: 4 }} />}
 
@@ -65,10 +93,10 @@ function GenerateScriptPage() {
         </Alert>
       )}
 
-      {!loading && success && (
+      {success ? (
         <Box mt={4}>
           <Alert severity="success">
-            ✅ Script created successfully! You can edit it anytime from your{" "}
+            ✅ Script created successfully! You can view it on your{" "}
             <strong>profile</strong>.
           </Alert>
           <Button
@@ -80,9 +108,9 @@ function GenerateScriptPage() {
             Go to Profile
           </Button>
         </Box>
+      ) : (
+        <ChatWizard onComplete={handleJobAlertSubmit} />
       )}
-
-      {!loading && !success && <ChatWizard onComplete={handleComplete} />}
     </Container>
   );
 }
