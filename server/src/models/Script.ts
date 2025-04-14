@@ -18,7 +18,7 @@ const ScriptSchema = new mongoose.Schema({
 
   executionTime: {
     type: String,
-    required: true, // תמיד נדרש, גם ל"יומי" וגם ל"שבועי"
+    required: true,
   },
 
   weeklyDay: {
@@ -30,6 +30,9 @@ const ScriptSchema = new mongoose.Schema({
       message: "weeklyDay is required when frequencyType is 'Every week'",
     },
   },
+
+  customization: { type: String, default: "" },
+
 
   createdAt: { type: Date, default: Date.now },
 });

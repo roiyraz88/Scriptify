@@ -3,7 +3,8 @@ import nodemailer from "nodemailer";
 
 interface JobSearchOptions {
   query: string;
-  resultLimit?: number;
+  customization: string;
+  resultLimit: number;
 }
 
 interface EmailOptions {
@@ -14,23 +15,46 @@ interface EmailOptions {
 
 export const searchJobsOnGoogle = async ({
   query,
+  customization,
   resultLimit = 10,
-}: {
-  query: string;
-  resultLimit?: number;
-}) => {
+}: JobSearchOptions) => {
   const SERP_API_KEY = process.env.SERP_API_KEY!;
+
+  const includesLocation =
+    customization.toLowerCase().includes("israel") ||
+    customization.toLowerCase().includes("tel aviv");
+
+  const locationAddition = includesLocation ? "" : "Israel";
+
+  const fullQuery = `site:linkedin.com/jobs OR site:glassdoor.com OR site:www.comeet.com/jobs "${query}" "${customization}" "${locationAddition}"`;
 
   const response = await axios.get("https://serpapi.com/search", {
     params: {
       engine: "google",
-      q: `${query} posted last 24 hours`,
+      q: fullQuery,
       api_key: SERP_API_KEY,
+      num: resultLimit + 10, // נוסיף קצת מרווח לסינון
     },
   });
 
-  const results = response.data.organic_results || [];
-  return results.slice(0, resultLimit);
+  const allResults = response.data.organic_results || [];
+
+  // סינון תוצאות לא רלוונטיות (כמו "17 משרות")
+  const filteredResults = allResults.filter((result: any) => {
+    const title = result.title?.toLowerCase() || "";
+    const link = result.link?.toLowerCase() || "";
+
+    const looksLikeList = /\b\d{1,3}\s+(jobs|positions|משרות|מקומות|משרות פנויות)\b/.test(title);
+    const looksLikeRealJob =
+      link.includes("linkedin.com/jobs/view") ||
+      link.includes("glassdoor.com/job") ||
+      link.includes("comeet.com/jobs") ||
+      link.includes("/job");
+
+    return !looksLikeList && looksLikeRealJob;
+  });
+
+  return filteredResults.slice(0, resultLimit);
 };
 
 
@@ -53,9 +77,6 @@ export const sendEmail = async ({ to, subject, text }: EmailOptions) => {
   });
 };
 
-/**
- * Format search results into plain text for emails
- */
 export const formatResultsForEmail = (
   results: any[],
   query: string

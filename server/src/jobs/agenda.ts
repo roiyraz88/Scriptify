@@ -35,16 +35,16 @@ agenda.define("run-job-alert-script", async (job: Job<JobData>) => {
   const user = await User.findById(script.owner);
   if (!user?.email) return;
 
-  // הבאת משרות מה-24 שעות האחרונות
   let results: JobResult[] = await searchJobsOnGoogle({
     query: script.query,
     resultLimit: script.resultLimit,
+    customization: script.customization || "", 
   });
+  
 
   const newResults = results;
 
   if (!newResults.length) {
-    console.log(`📭 No jobs found in the last 24 hours for script ${scriptId}`);
     return;
   }
 
@@ -56,7 +56,6 @@ agenda.define("run-job-alert-script", async (job: Job<JobData>) => {
     text: `${emailBody}\n\n(Automated by Scriptify 🚀)`,
   });
 
-  console.log(`✅ Sent ${newResults.length} new jobs to ${user.email}`);
 });
 
 export default agenda;

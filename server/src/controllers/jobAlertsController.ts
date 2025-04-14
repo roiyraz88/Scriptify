@@ -8,6 +8,8 @@ import {
 } from "../utils/scriptRunnerUtil";
 import agenda from "../jobs/agenda";
 import { getCronString } from "../utils/cronHelper";
+import { generatePythonScriptFromPrompt } from "../services/gemini";
+import { validatePromptWithAI } from "../services/promptValidator";
 
 export const handleJobAlerts = async (req: Request, res: Response) => {
   const {
@@ -17,19 +19,24 @@ export const handleJobAlerts = async (req: Request, res: Response) => {
     frequencyType,
     executionTime,
     weeklyDay,
-    category,
+    customization,
   } = req.body;
 
-  if (!emailRecipient || !query || !frequencyType || !executionTime || !category) {
+  if (!emailRecipient || !query || !frequencyType || !executionTime) {
     return res.status(400).json({ message: "Missing required fields" });
   }
 
   try {
-    // קבלת משרות מה-24 שעות האחרונות בלבד
-    const results = await searchJobsOnGoogle({ query, resultLimit });
+    const results = await searchJobsOnGoogle({
+      query,
+      customization: customization,
+      resultLimit,
+    });
 
     if (!results.length) {
-      return res.status(200).json({ message: "📭 No jobs found in the last 24 hours." });
+      return res
+        .status(200)
+        .json({ message: "📭 No jobs found in the last 24 hours." });
     }
 
     const emailBody = formatResultsForEmail(results, query);
@@ -42,14 +49,20 @@ export const handleJobAlerts = async (req: Request, res: Response) => {
       scheduleDescription = `Runs every week on ${weeklyDay} at ${executionTime}`;
     }
 
-    // שליחת מייל מיידית עם התוצאות
     await sendEmail({
       to: emailRecipient,
       subject,
       text: `${emailBody}\n\n🔁 Schedule: ${scheduleDescription}`,
     });
 
-    // יצירת הסקריפט במסד
+    // יצירת סקריפט אוטומטי בעזרת Gemini
+    const basePrompt = `Search for job postings related to "${query}" using SerpAPI, and send the results to ${emailRecipient} via Gmail.`;
+    const fullPrompt = customization
+      ? `${basePrompt} ${customization.trim()}`
+      : basePrompt;
+
+    const generatedScript = await generatePythonScriptFromPrompt(fullPrompt);
+
     const script = await Script.create({
       owner: (req as any).userId,
       emailRecipient,
@@ -58,14 +71,13 @@ export const handleJobAlerts = async (req: Request, res: Response) => {
       frequencyType,
       executionTime,
       weeklyDay,
-      category,
     });
 
-    // תזמון הרצות עתידיות
     const cronString = getCronString(frequencyType, executionTime, weeklyDay);
-    await agenda.schedule(cronString, "run-job-alert-script", { scriptId: script._id });
+    await agenda.schedule(cronString, "run-job-alert-script", {
+      scriptId: script._id,
+    });
 
-    // שיוך הסקריפט למשתמש
     await User.findByIdAndUpdate((req as any).userId, {
       $push: { scripts: script._id },
     });
@@ -73,9 +85,12 @@ export const handleJobAlerts = async (req: Request, res: Response) => {
     return res.status(200).json({
       message: `✅ Job alert created and email sent to ${emailRecipient}`,
       schedule: scheduleDescription,
+      generatedScript,
     });
   } catch (error) {
     console.error("Job Alert Error:", error);
-    return res.status(500).json({ message: "❌ Failed to create job alert script" });
+    return res
+      .status(500)
+      .json({ message: "❌ Failed to create job alert script" });
   }
 };
