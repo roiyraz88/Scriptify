@@ -43,7 +43,7 @@ function GenerateScriptPage() {
         customization: answers.customization || "",
       };
 
-      const res = await API.post("/scripts/generate", payload, {
+      await API.post("/scripts/generate", payload, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
