@@ -18,28 +18,10 @@ const ScriptSchema = new mongoose.Schema({
 
   executionTime: {
     type: String,
-    required: true,
-  },
-
-  // נוסיף את זה כדי להציג נכון בפרופיל
-  dailyTime: {
-    type: String,
-    required: function (this: any) {
-      return this.frequencyType === "Every day";
-    },
+    required: true, // תמיד חובה
   },
 
   weeklyDay: {
-    type: String,
-    validate: {
-      validator: function (this: any) {
-        return this.frequencyType !== "Every week" || !!this.weeklyDay;
-      },
-      message: "weeklyDay is required when frequencyType is 'Every week'",
-    },
-  },
-
-  weeklyTime: {
     type: String,
     required: function (this: any) {
       return this.frequencyType === "Every week";

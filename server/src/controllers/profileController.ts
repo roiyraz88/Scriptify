@@ -36,34 +36,45 @@ export const deleteScript = async (req: Request, res: Response) => {
 export const updateScript = async (req: Request, res: Response) => {
   const scriptId = req.params.id;
   const userId = (req as any).userId;
+
   const {
     query,
     resultLimit,
     frequencyType,
-    dailyTime,
+    executionTime,
     weeklyDay,
-    weeklyTime,
     customization,
   } = req.body;
 
+  // ולידציה בסיסית
+  if (!query || !frequencyType || !executionTime) {
+    return res.status(400).json({ message: "Missing required fields" });
+  }
+
   try {
+    const updateData: any = {
+      query,
+      resultLimit,
+      frequencyType,
+      executionTime,
+      customization,
+    };
+
+    // הוסף רק אם Weekly
+    if (frequencyType === "Every week") {
+      updateData.weeklyDay = weeklyDay;
+    } else {
+      updateData.weeklyDay = undefined; // מנקה אם זה כבר לא רלוונטי
+    }
+
     const script = await Script.findOneAndUpdate(
       { _id: scriptId, owner: userId },
-      {
-        query,
-        resultLimit,
-        frequencyType,
-        dailyTime,
-        weeklyDay,
-        weeklyTime,
-        customization, // נוסיף גם את זה
-      },
+      updateData,
       { new: true }
     );
 
     if (!script) {
-      res.status(404).json({ message: "Script not found" });
-      return;
+      return res.status(404).json({ message: "Script not found" });
     }
 
     res.status(200).json({ message: "Script updated", script });

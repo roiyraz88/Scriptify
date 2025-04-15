@@ -19,11 +19,16 @@ export const handleJobAlerts = async (req: Request, res: Response) => {
     executionTime,
     weeklyDay,
     customization,
-    weeklyTime,
   } = req.body;
 
   if (!emailRecipient || !query || !frequencyType || !executionTime) {
     return res.status(400).json({ message: "Missing required fields" });
+  }
+
+  if (frequencyType === "Every week" && !weeklyDay) {
+    return res
+      .status(400)
+      .json({ message: "weeklyDay is required for weekly frequency" });
   }
 
   try {
@@ -32,7 +37,9 @@ export const handleJobAlerts = async (req: Request, res: Response) => {
       existing = await Script.findOne({ owner: (req as any).userId });
     } catch (err) {
       console.error("❌ Failed to check existing script:", err);
-      return res.status(500).json({ message: "Failed to check existing script" });
+      return res
+        .status(500)
+        .json({ message: "Failed to check existing script" });
     }
 
     if (existing) {
@@ -66,28 +73,35 @@ export const handleJobAlerts = async (req: Request, res: Response) => {
     }
 
     try {
+      const htmlBody = formatResultsForEmail(results, query);
+
       await sendEmail({
         to: emailRecipient,
         subject,
-        text: `${emailBody}\n\n🔁 Schedule: ${scheduleDescription}`,
+        html: htmlBody, // ✅
       });
     } catch (err) {
       console.error("❌ Failed to send email:", err);
-      return res.status(500).json({ message: "Failed to send initial job alert email" });
+      return res
+        .status(500)
+        .json({ message: "Failed to send initial job alert email" });
     }
 
     let generatedScript;
     try {
       const basePrompt = `Search for job postings related to \"${query}\" using SerpAPI, and send the results to ${emailRecipient} via Gmail.`;
-      const fullPrompt = customization ? `${basePrompt} ${customization.trim()}` : basePrompt;
+      const fullPrompt = customization
+        ? `${basePrompt} ${customization.trim()}`
+        : basePrompt;
       generatedScript = await generatePythonScriptFromPrompt(fullPrompt);
     } catch (err) {
       console.error("❌ Failed to generate script:", err);
-      return res.status(500).json({ message: "Failed to generate script from AI" });
+      return res
+        .status(500)
+        .json({ message: "Failed to generate script from AI" });
     }
 
     let script;
-    const executionTimeToUse = frequencyType === "Every day" ? executionTime : weeklyTime;
     try {
       script = await Script.create({
         owner: (req as any).userId,
@@ -95,19 +109,19 @@ export const handleJobAlerts = async (req: Request, res: Response) => {
         query,
         resultLimit,
         frequencyType,
-        executionTime: executionTimeToUse,
-        weeklyDay,
-        weeklyTime: frequencyType === "Every week" ? weeklyTime : undefined,
-        dailyTime: frequencyType === "Every day" ? executionTime : undefined,
+        executionTime,
+        weeklyDay: frequencyType === "Every week" ? weeklyDay : undefined,
         customization,
       });
     } catch (err) {
       console.error("❌ Failed to save script to DB:", err);
-      return res.status(500).json({ message: "Failed to save script to database" });
+      return res
+        .status(500)
+        .json({ message: "Failed to save script to database" });
     }
 
     try {
-      const cronString = getCronString(frequencyType, executionTimeToUse, weeklyDay);
+      const cronString = getCronString(frequencyType, executionTime, weeklyDay);
       await agenda.schedule(cronString, "run-job-alert-script", {
         scriptId: script._id,
       });
@@ -133,6 +147,8 @@ export const handleJobAlerts = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("Job Alert Error:", error);
-    return res.status(500).json({ message: "❌ Failed to create job alert script" });
+    return res
+      .status(500)
+      .json({ message: "❌ Failed to create job alert script" });
   }
 };

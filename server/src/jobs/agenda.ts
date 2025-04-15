@@ -27,6 +27,7 @@ interface JobResult {
   link: string;
 }
 
+// הגדרת המשימה שתתבצע בזמן שנקבע
 agenda.define("run-job-alert-script", async (job: Job<JobData>) => {
   const { scriptId } = job.attrs.data;
 
@@ -53,13 +54,40 @@ agenda.define("run-job-alert-script", async (job: Job<JobData>) => {
   });
 });
 
-export const getUTCFromLocalTime = (time: string): string => {
-  const [hour, minute] = time.split(":".toString()).map(Number);
+// הפונקציה שמחזירה ביטוי cron מתאים לפי סוג התזמון
+export const getCronString = (
+  frequencyType: string,
+  time: string,
+  weeklyDay?: string
+): string => {
+  const [hour, minute] = time.split(":").map(Number);
+
   const localTime = DateTime.fromObject({ hour, minute }, {
     zone: "Asia/Jerusalem",
   });
   const utcTime = localTime.toUTC();
-  return `${utcTime.minute} ${utcTime.hour} * * *`;
+
+  if (frequencyType === "Every day") {
+    // כל יום באותה שעה
+    return `${utcTime.minute} ${utcTime.hour} * * *`;
+  }
+
+  if (frequencyType === "Every week" && weeklyDay) {
+    const daysMap: { [key: string]: number } = {
+      Sunday: 0,
+      Monday: 1,
+      Tuesday: 2,
+      Wednesday: 3,
+      Thursday: 4,
+      Friday: 5,
+      Saturday: 6,
+    };
+
+    const dayOfWeek = daysMap[weeklyDay];
+    return `${utcTime.minute} ${utcTime.hour} * * ${dayOfWeek}`;
+  }
+
+  return "* * * * *";
 };
 
 export default agenda;

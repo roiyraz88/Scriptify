@@ -7,13 +7,17 @@ export const generateScriptController = async (req: Request, res: Response) => {
     query,
     resultLimit,
     frequencyType,
-    executionTime,
+    executionTime, 
     weeklyDay,
-    customPrompt, 
+    customization,
   } = req.body;
 
   if (!emailRecipient || !query || !resultLimit || !frequencyType || !executionTime) {
     return res.status(400).json({ message: "Missing required fields for job alerts." });
+  }
+
+  if (frequencyType === "Every week" && !weeklyDay) {
+    return res.status(400).json({ message: "weeklyDay is required when frequencyType is 'Every week'." });
   }
 
   try {

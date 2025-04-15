@@ -7,7 +7,6 @@ export const getCronString = (
 ): string => {
   const [hour, minute] = executionTime.split(":").map(Number);
 
-  // המרה מ־Asia/Jerusalem ל־UTC
   const utcTime = DateTime.fromObject(
     { hour, minute },
     { zone: "Asia/Jerusalem" }
