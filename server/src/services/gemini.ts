@@ -1,4 +1,5 @@
 import axios from "axios";
+import { log } from "console";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -8,24 +9,26 @@ const GEMINI_BASE_URL = `https://generativelanguage.googleapis.com/v1/models/gem
 export const generatePythonScriptFromPrompt = async (
   userPrompt: string
 ): Promise<string> => {
+  console.log(userPrompt);
   try {
     const fullPrompt = `
-You are a Python script generator for automating job alerts.
-
-Your task:
-- Use SerpAPI to search Google for job listings
-- Use smtplib to email the results via Gmail
-- Save the results in a .txt file
-- Only use the environment variables: SERP_API_KEY and EMAIL_APP_PASSWORD
-
-Restrictions:
-- Do NOT use any other APIs
-- Do NOT use os.environ.get() for anything except the two allowed keys
-
-Output only valid Python code. No explanations or markdown.
-
-User addition:
-"""${userPrompt}"""
+    You are a Python script generator designed to automate job alert emails.
+    
+    Context:
+    - The user provides job-related keywords and optional filters (e.g., location, job type).
+    - The script should use SerpAPI to search Google for relevant job postings based on these inputs.
+    - Filter out general job listing pages and include only direct job result links.
+    - The script should send the results via Gmail (use EMAIL_APP_PASSWORD) and save them in a local jobs.txt file.
+    
+    Constraints:
+    - Use only the following environment variables: SERP_API_KEY and EMAIL_APP_PASSWORD.
+    - Do NOT use any other external APIs or libraries besides 'requests' and 'smtplib'.
+    - Do NOT use os.environ.get() for anything except these two variables.
+    - Do NOT include explanations, markdown, or comments.
+    - Output ONLY valid Python code (no markdown).
+    
+    User customization:
+    """${userPrompt}"""
     `.trim();
 
     console.log("🧠 Sending prompt to Gemini...");
