@@ -13,10 +13,10 @@ export const requireAuth: RequestHandler = (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, process.env.JWT_ACCESS_SECRET!) as {
-      userId: string;
+      id: string;
     };
 
-    (req as any).userId = decoded.userId;
+    (req as any).userId = decoded.id;
 
     next();
   } catch (err) {
