@@ -16,7 +16,7 @@ interface EmailOptions {
 export const searchJobsOnGoogle = async ({
   query,
   customization,
-  resultLimit = 10,
+  resultLimit = 1,
 }: JobSearchOptions) => {
   const SERP_API_KEY = process.env.SERP_API_KEY!;
 
@@ -25,38 +25,38 @@ export const searchJobsOnGoogle = async ({
     customization.toLowerCase().includes("tel aviv");
 
   const locationAddition = includesLocation ? "" : "Israel";
-
-  const fullQuery = `site:linkedin.com/jobs OR site:glassdoor.com OR site:www.comeet.com/jobs "${query}" "${customization}" "${locationAddition}"`;
+  const fullQuery = `site:www.comeet.com/jobs "${query}" "${customization}" "${locationAddition}"`;
 
   const response = await axios.get("https://serpapi.com/search", {
     params: {
       engine: "google",
       q: fullQuery,
       api_key: SERP_API_KEY,
-      num: resultLimit + 10, // נוסיף קצת מרווח לסינון
+      num: Math.max(20, resultLimit * 2)
     },
   });
 
-  const allResults = response.data.organic_results || [];
+  const results = response.data.organic_results || [];
 
-  // סינון תוצאות לא רלוונטיות (כמו "17 משרות")
-  const filteredResults = allResults.filter((result: any) => {
-    const title = result.title?.toLowerCase() || "";
-    const link = result.link?.toLowerCase() || "";
+  const filteredResults = results.filter((r: any) => {
+    const title = r.title?.toLowerCase() || "";
+    const link = r.link?.toLowerCase() || "";
 
-    const looksLikeList = /\b\d{1,3}\s+(jobs|positions|משרות|מקומות|משרות פנויות)\b/.test(title);
-    const looksLikeRealJob =
+    const isListPage =
+      /\b\d{1,4}\s+(jobs|positions|משרות|מקומות)\b/.test(title) ||
+      /\/jobs\/?$/.test(link);
+
+    const isJobPage =
       link.includes("linkedin.com/jobs/view") ||
       link.includes("glassdoor.com/job") ||
-      link.includes("comeet.com/jobs") ||
-      link.includes("/job");
+      link.includes("comeet.com/jobs/") ||
+      link.includes("/job/");
 
-    return !looksLikeList && looksLikeRealJob;
+    return !isListPage && isJobPage;
   });
 
-  return filteredResults.slice(0, resultLimit);
+  return filteredResults.slice(0, resultLimit); // מחזיר לפי הכמות שביקש המשתמש
 };
-
 
 export const sendEmail = async ({ to, subject, text }: EmailOptions) => {
   const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY!;
@@ -77,15 +77,11 @@ export const sendEmail = async ({ to, subject, text }: EmailOptions) => {
   });
 };
 
-export const formatResultsForEmail = (
-  results: any[],
-  query: string
-): string => {
+export const formatResultsForEmail = (results: any[], query: string): string => {
   const topResults = results.map(
-    (result, i) => `${i + 1}. ${result.title}\n${result.link}`
+    (result, i) =>
+      `${i + 1}. ${result.title}\n🔗 ${result.link}\n📝 ${result.snippet || ""}`
   );
 
-  return `Here are the top ${
-    topResults.length
-  } job listings for "${query}":\n\n${topResults.join("\n\n")}`;
+  return `Here ${topResults.length === 1 ? "is" : "are"} your job alert${topResults.length === 1 ? "" : "s"} for "${query}":\n\n${topResults.join("\n\n")}`;
 };

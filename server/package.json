@@ -25,6 +25,7 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "jsonwebtoken": "^9.0.2",
+    "luxon": "^3.6.1",
     "mongoose": "^7.6.3",
     "node-cron": "^3.0.3",
     "nodemailer": "^6.10.0"
@@ -36,6 +37,7 @@
     "@types/express": "^5.0.1",
     "@types/jest": "^29.5.14",
     "@types/jsonwebtoken": "^9.0.9",
+    "@types/luxon": "^3.6.2",
     "@types/mocha": "^10.0.10",
     "@types/node": "^22.14.0",
     "@types/node-cron": "^3.0.11",

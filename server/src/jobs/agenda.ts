@@ -7,6 +7,7 @@ import {
   sendEmail,
 } from "../utils/scriptRunnerUtil";
 import dotenv from "dotenv";
+import { DateTime } from "luxon";
 
 dotenv.config();
 
@@ -35,27 +36,30 @@ agenda.define("run-job-alert-script", async (job: Job<JobData>) => {
   const user = await User.findById(script.owner);
   if (!user?.email) return;
 
-  let results: JobResult[] = await searchJobsOnGoogle({
+  const results: JobResult[] = await searchJobsOnGoogle({
     query: script.query,
     resultLimit: script.resultLimit,
-    customization: script.customization || "", 
+    customization: script.customization || "",
   });
-  
 
-  const newResults = results;
+  if (!results.length) return;
 
-  if (!newResults.length) {
-    return;
-  }
-
-  const emailBody = formatResultsForEmail(newResults, script.query);
+  const emailBody = formatResultsForEmail(results, script.query);
 
   await sendEmail({
     to: user.email,
     subject: `🔁 Job Alert for "${script.query}"`,
     text: `${emailBody}\n\n(Automated by Scriptify 🚀)`,
   });
-
 });
+
+export const getUTCFromLocalTime = (time: string): string => {
+  const [hour, minute] = time.split(":".toString()).map(Number);
+  const localTime = DateTime.fromObject({ hour, minute }, {
+    zone: "Asia/Jerusalem",
+  });
+  const utcTime = localTime.toUTC();
+  return `${utcTime.minute} ${utcTime.hour} * * *`;
+};
 
 export default agenda;

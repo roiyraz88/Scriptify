@@ -1,15 +1,14 @@
 import { Request, Response } from "express";
 import Script from "../models/Script";
 import User from "../models/User";
+import agenda from "../jobs/agenda";
 import {
   searchJobsOnGoogle,
   formatResultsForEmail,
   sendEmail,
 } from "../utils/scriptRunnerUtil";
-import agenda from "../jobs/agenda";
-import { getCronString } from "../utils/cronHelper";
 import { generatePythonScriptFromPrompt } from "../services/gemini";
-import { validatePromptWithAI } from "../services/promptValidator";
+import { getCronString } from "../utils/cronHelper";
 
 export const handleJobAlerts = async (req: Request, res: Response) => {
   const {
@@ -27,20 +26,24 @@ export const handleJobAlerts = async (req: Request, res: Response) => {
   }
 
   try {
+    // Optional: prevent duplicate script per user
+    const existing = await Script.findOne({ owner: (req as any).userId });
+    if (existing) {
+      return res.status(409).json({ message: "You already have a script." });
+    }
+
     const results = await searchJobsOnGoogle({
       query,
-      customization: customization,
+      customization,
       resultLimit,
     });
 
     if (!results.length) {
-      return res
-        .status(200)
-        .json({ message: "📭 No jobs found in the last 24 hours." });
+      return res.status(204).json({ message: "📭 No jobs found." });
     }
 
     const emailBody = formatResultsForEmail(results, query);
-    const subject = `🎯 Your Job Alerts for "${query}"`;
+    const subject = `🎯 Your Job Alerts for \"${query}\"`;
 
     let scheduleDescription = "";
     if (frequencyType === "Every day") {
@@ -55,11 +58,8 @@ export const handleJobAlerts = async (req: Request, res: Response) => {
       text: `${emailBody}\n\n🔁 Schedule: ${scheduleDescription}`,
     });
 
-    // יצירת סקריפט אוטומטי בעזרת Gemini
-    const basePrompt = `Search for job postings related to "${query}" using SerpAPI, and send the results to ${emailRecipient} via Gmail.`;
-    const fullPrompt = customization
-      ? `${basePrompt} ${customization.trim()}`
-      : basePrompt;
+    const basePrompt = `Search for job postings related to \"${query}\" using SerpAPI, and send the results to ${emailRecipient} via Gmail.`;
+    const fullPrompt = customization ? `${basePrompt} ${customization.trim()}` : basePrompt;
 
     const generatedScript = await generatePythonScriptFromPrompt(fullPrompt);
 
@@ -71,12 +71,18 @@ export const handleJobAlerts = async (req: Request, res: Response) => {
       frequencyType,
       executionTime,
       weeklyDay,
+      customization,
     });
 
-    const cronString = getCronString(frequencyType, executionTime, weeklyDay);
-    await agenda.schedule(cronString, "run-job-alert-script", {
-      scriptId: script._id,
-    });
+    try {
+      const cronString = getCronString(frequencyType, executionTime, weeklyDay);
+      await agenda.schedule(cronString, "run-job-alert-script", {
+        scriptId: script._id,
+      });
+    } catch (err) {
+      console.error("❌ Agenda schedule failed:", err);
+      return res.status(500).json({ message: "Failed to schedule the job" });
+    }
 
     await User.findByIdAndUpdate((req as any).userId, {
       $push: { scripts: script._id },
@@ -86,11 +92,10 @@ export const handleJobAlerts = async (req: Request, res: Response) => {
       message: `✅ Job alert created and email sent to ${emailRecipient}`,
       schedule: scheduleDescription,
       generatedScript,
+      script,
     });
   } catch (error) {
     console.error("Job Alert Error:", error);
-    return res
-      .status(500)
-      .json({ message: "❌ Failed to create job alert script" });
+    return res.status(500).json({ message: "❌ Failed to create job alert script" });
   }
 };

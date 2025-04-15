@@ -43,6 +43,7 @@ export const updateScript = async (req: Request, res: Response) => {
     dailyTime,
     weeklyDay,
     weeklyTime,
+    customization,
   } = req.body;
 
   try {
@@ -55,8 +56,9 @@ export const updateScript = async (req: Request, res: Response) => {
         dailyTime,
         weeklyDay,
         weeklyTime,
+        customization, // נוסיף גם את זה
       },
-      { new: true } 
+      { new: true }
     );
 
     if (!script) {
@@ -66,6 +68,7 @@ export const updateScript = async (req: Request, res: Response) => {
 
     res.status(200).json({ message: "Script updated", script });
   } catch (error) {
+    console.error("Update error:", error);
     res.status(500).json({ message: "Failed to update script" });
   }
 };
