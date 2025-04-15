@@ -103,7 +103,6 @@ function ChatWizard({
       (_, i) => `${i.toString().padStart(2, "0")}:00`
     );
 
-    // בשלב frequencyType בתוך handleNext (שורה 76 בערך):
     if (currentStep.id === "frequencyType") {
       const customizationStep = steps.find((s) => s.id === "customization");
 
@@ -163,9 +162,7 @@ function ChatWizard({
           <Box mb={2}>
             {step.id !== "done" && (
               <Box display="flex" alignItems="flex-start" gap={1}>
-                <Avatar sx={{ bgcolor: "primary.main", fontSize: 10 }}>
-                  S
-                </Avatar>
+                <Avatar sx={{ bgcolor: "primary.main", fontSize: 10 }}>S</Avatar>
                 <Box
                   bgcolor="#333"
                   color="white"
@@ -289,11 +286,11 @@ function ChatWizard({
             </>
           )}
 
-          {/* {errorMessage && (
+          {errorMessage && (
             <Typography variant="body2" color="error">
               {errorMessage}
             </Typography>
-          )} */}
+          )}
 
           {currentStepIndex > 0 && (
             <Button variant="text" onClick={handleBack}>
