@@ -98,7 +98,7 @@ export const handleJobAlerts = async (req: Request, res: Response) => {
       console.error("❌ Failed to generate script:", err);
       return res
         .status(500)
-        .json({ message: "Failed to generate script from AI" });
+        .json({ message: "Failed to generate script from AI !!!" });
     }
 
     let script;

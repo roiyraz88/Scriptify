@@ -50,7 +50,7 @@ agenda.define("run-job-alert-script", async (job: Job<JobData>) => {
   await sendEmail({
     to: user.email,
     subject: `🔁 Job Alert for "${script.query}"`,
-    text: `${emailBody}\n\n(Automated by Scriptify 🚀)`,
+    html: `${emailBody.replace(/\n/g, "<br>")}<br><br><small>(Automated by Scriptify 🚀)</small>`,
   });
 });
 

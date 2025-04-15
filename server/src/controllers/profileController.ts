@@ -46,9 +46,9 @@ export const updateScript = async (req: Request, res: Response) => {
     customization,
   } = req.body;
 
-  // ולידציה בסיסית
   if (!query || !frequencyType || !executionTime) {
-    return res.status(400).json({ message: "Missing required fields" });
+    res.status(400).json({ message: "Missing required fields" });
+    return;
   }
 
   try {
@@ -60,11 +60,10 @@ export const updateScript = async (req: Request, res: Response) => {
       customization,
     };
 
-    // הוסף רק אם Weekly
     if (frequencyType === "Every week") {
       updateData.weeklyDay = weeklyDay;
     } else {
-      updateData.weeklyDay = undefined; // מנקה אם זה כבר לא רלוונטי
+      updateData.weeklyDay = undefined;
     }
 
     const script = await Script.findOneAndUpdate(
@@ -74,7 +73,8 @@ export const updateScript = async (req: Request, res: Response) => {
     );
 
     if (!script) {
-      return res.status(404).json({ message: "Script not found" });
+      res.status(404).json({ message: "Script not found" });
+      return;
     }
 
     res.status(200).json({ message: "Script updated", script });
