@@ -289,11 +289,11 @@ function ChatWizard({
             </>
           )}
 
-          {errorMessage && (
+          {/* {errorMessage && (
             <Typography variant="body2" color="error">
               {errorMessage}
             </Typography>
-          )}
+          )} */}
 
           {currentStepIndex > 0 && (
             <Button variant="text" onClick={handleBack}>
