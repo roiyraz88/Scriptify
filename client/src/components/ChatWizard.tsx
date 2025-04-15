@@ -278,6 +278,14 @@ function ChatWizard({
                   {stepHints[currentStep.id]}
                 </Typography>
               )}
+              <Button
+                variant="contained"
+                color="primary"
+                disabled={!inputValue.trim()}
+                onClick={() => handleNext(inputValue.trim())}
+              >
+                Send
+              </Button>
             </>
           )}
 
