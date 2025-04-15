@@ -15,9 +15,8 @@ type StepType =
   | { id: "query"; question: string }
   | { id: "resultLimit"; question: string }
   | { id: "frequencyType"; question: string; options: string[] }
-  | { id: "dailyTime"; question: string; options: string[] }
   | { id: "weeklyDay"; question: string; options: string[] }
-  | { id: "weeklyTime"; question: string; options: string[] }
+  | { id: "executionTime"; question: string; options: string[] }
   | { id: "customization"; question: string }
   | { id: "done" };
 
@@ -51,9 +50,8 @@ const stepHints: Record<string, string> = {
   query: "💼 Use keywords like 'junior frontend developer' or 'QA Tel Aviv'.",
   resultLimit: "🔢 Choose how many job results you want (1 to 20).",
   frequencyType: "⏱️ Decide how often the script should run: daily or weekly.",
-  dailyTime: "🕒 Choose the hour the script should run every day.",
+  executionTime: "🕒 Choose the hour you'd like the script to run.",
   weeklyDay: "📅 Select the day of the week to run the job alert.",
-  weeklyTime: "🕒 What time on that day should the alert run?",
   customization:
     "🛠️ Add filters like location, job type or seniority (e.g. 'only remote jobs in Israel').",
 };
@@ -108,8 +106,8 @@ function ChatWizard({
 
       if (answer === "Every day") {
         newSteps.push({
-          id: "dailyTime",
-          question: "At what hour should the script run every day?",
+          id: "executionTime",
+          question: "At what hour should the script run?",
           options: hourOptions,
         });
         if (customizationStep) newSteps.push(customizationStep);
@@ -129,8 +127,8 @@ function ChatWizard({
           ],
         });
         newSteps.push({
-          id: "weeklyTime",
-          question: "At what hour on that day should the script run?",
+          id: "executionTime",
+          question: "At what hour should the script run?",
           options: hourOptions,
         });
         if (customizationStep) newSteps.push(customizationStep);

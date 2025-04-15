@@ -24,9 +24,8 @@ interface Script {
   query: string;
   resultLimit: number;
   frequencyType: string;
-  dailyTime?: string;
+  executionTime: string;
   weeklyDay?: string;
-  weeklyTime?: string;
   customization?: string;
   createdAt: string;
 }
@@ -69,16 +68,10 @@ function ProfilePage() {
     try {
       const token = localStorage.getItem("accessToken");
 
-      const updatedQuery = `site:linkedin.com/jobs OR site:glassdoor.com OR site:indeed.com "${editData.query}"`;
-
       const res = await API.put(
         `/profile/my-scripts/${selectedScriptId}`,
         {
           ...editData,
-          query: updatedQuery,
-          dailyTime: editData.dailyTime,
-          weeklyDay: editData.weeklyDay,
-          weeklyTime: editData.weeklyTime,
         },
         {
           headers: { Authorization: `Bearer ${token}` },
@@ -161,26 +154,15 @@ function ProfilePage() {
                   <strong>⏰ Frequency:</strong> {script.frequencyType}
                 </Typography>
 
-                {script.frequencyType === "Every day" && script.dailyTime && (
+                {script.frequencyType === "Every week" && script.weeklyDay && (
                   <Typography sx={{ color: "#fff" }}>
-                    <strong>🕐 Time:</strong> {script.dailyTime}
+                    <strong>📅 Day:</strong> {script.weeklyDay}
                   </Typography>
                 )}
 
-                {script.frequencyType === "Every week" && (
-                  <>
-                    {script.weeklyDay && (
-                      <Typography sx={{ color: "#fff" }}>
-                        <strong>📅 Day:</strong> {script.weeklyDay}
-                      </Typography>
-                    )}
-                    {script.weeklyTime && (
-                      <Typography sx={{ color: "#fff" }}>
-                        <strong>🕐 Time:</strong> {script.weeklyTime}
-                      </Typography>
-                    )}
-                  </>
-                )}
+                <Typography sx={{ color: "#fff" }}>
+                  <strong>🕐 Time:</strong> {script.executionTime}
+                </Typography>
 
                 <Typography variant="caption" sx={{ color: "#aaa" }}>
                   Created: {new Date(script.createdAt).toLocaleString()}
@@ -213,6 +195,7 @@ function ProfilePage() {
         ))
       )}
 
+      {/* Delete Confirmation */}
       <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
         <DialogTitle>
           ❗ Are you sure you want to delete this script?
@@ -236,6 +219,7 @@ function ProfilePage() {
         </DialogActions>
       </Dialog>
 
+      {/* Edit Dialog */}
       <Dialog open={editOpen} onClose={() => setEditOpen(false)}>
         <DialogTitle>Edit Script</DialogTitle>
         <DialogContent
@@ -268,13 +252,11 @@ function ProfilePage() {
                   ...editData,
                   frequencyType: value,
                   weeklyDay: "",
-                  weeklyTime: "",
                 });
               } else {
                 setEditData({
                   ...editData,
                   frequencyType: value,
-                  dailyTime: "",
                 });
               }
             }}
@@ -282,13 +264,31 @@ function ProfilePage() {
             <MenuItem value="Every day">Every day</MenuItem>
             <MenuItem value="Every week">Every week</MenuItem>
           </TextField>
-          {editData.frequencyType === "Every day" && (
+
+          {editData.frequencyType === "Every week" && (
             <TextField
               select
-              label="Daily Time"
-              value={editData.dailyTime || ""}
+              label="Weekly Day"
+              value={editData.weeklyDay || ""}
               onChange={(e) =>
-                setEditData({ ...editData, dailyTime: e.target.value })
+                setEditData({ ...editData, weeklyDay: e.target.value })
+              }
+            >
+              {days.map((day) => (
+                <MenuItem key={day} value={day}>
+                  {day}
+                </MenuItem>
+              ))}
+            </TextField>
+          )}
+
+          {editData.frequencyType && (
+            <TextField
+              select
+              label="Time"
+              value={editData.executionTime || ""}
+              onChange={(e) =>
+                setEditData({ ...editData, executionTime: e.target.value })
               }
             >
               {hourOptions.map((hour) => (
@@ -298,38 +298,7 @@ function ProfilePage() {
               ))}
             </TextField>
           )}
-          {editData.frequencyType === "Every week" && (
-            <>
-              <TextField
-                select
-                label="Weekly Day"
-                value={editData.weeklyDay || ""}
-                onChange={(e) =>
-                  setEditData({ ...editData, weeklyDay: e.target.value })
-                }
-              >
-                {days.map((day) => (
-                  <MenuItem key={day} value={day}>
-                    {day}
-                  </MenuItem>
-                ))}
-              </TextField>
-              <TextField
-                select
-                label="Weekly Time"
-                value={editData.weeklyTime || ""}
-                onChange={(e) =>
-                  setEditData({ ...editData, weeklyTime: e.target.value })
-                }
-              >
-                {hourOptions.map((hour) => (
-                  <MenuItem key={hour} value={hour}>
-                    {hour}
-                  </MenuItem>
-                ))}
-              </TextField>
-            </>
-          )}
+
           <TextField
             label="Customization"
             multiline

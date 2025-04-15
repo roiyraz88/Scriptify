@@ -56,10 +56,11 @@ function GenerateScriptPage() {
         query: answers.query,
         resultLimit: answers.resultLimit,
         frequencyType: answers.frequencyType,
-        executionTime: answers.dailyTime || answers.weeklyTime,
+        executionTime: answers.executionTime, 
         weeklyDay: answers.weeklyDay,
         customization: answers.customization || "",
       };
+      
 
       const res = await API.post("/scripts/generate", payload, {
         headers: {
@@ -77,15 +78,20 @@ function GenerateScriptPage() {
       } else {
         setError("⚠️ Something went wrong. Script was not created.");
       }
-    } catch (err: any) {
-      if (err.response?.status === 409) {
+    } catch (error: unknown) {
+      if (
+        typeof error === "object" &&
+        error !== null &&
+        "response" in error &&
+        (error as { response?: { status?: number } }).response?.status === 409
+      ) {
         setError(
           "⚠️ You already have a script. You can edit it from your profile."
         );
       } else {
         setError("🚫 Something went wrong. Please try again later.");
       }
-      console.error(err);
+      console.error(error);
     } finally {
       setLoading(false);
     }
