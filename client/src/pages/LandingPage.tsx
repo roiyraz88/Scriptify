@@ -72,13 +72,13 @@ function LandingPage({
                 Scriptify
               </Typography>
               <Typography variant="h5" sx={{ color: "#ddd", mb: 4 }}>
-                Easily generate Python scripts without writing code.
+                Get notified about new job postings automatically.
               </Typography>
             </motion.div>
             <Box display="flex" justifyContent="center" gap={2} flexWrap="wrap">
               <motion.div whileHover={{ scale: 1.1 }}>
                 <Button variant="contained" size="large" onClick={onLoginClick}>
-                  Get Started
+                  Get Job Alerts
                 </Button>
               </motion.div>
               <motion.div whileHover={{ scale: 1.1 }}>
@@ -96,7 +96,7 @@ function LandingPage({
         </Container>
       </Box>
 
-      {/* What is a Python script? */}
+      {/* What Scriptify Does */}
       <FadeInSection>
         <Box
           minHeight="100vh"
@@ -112,26 +112,22 @@ function LandingPage({
         >
           <Container maxWidth="md">
             <Typography variant="h3" sx={{ fontWeight: 600, mb: 2, color: "white" }}>
-              What is a Python script?
+              Never miss a job opportunity.
             </Typography>
             <Typography variant="h6" sx={{ color: "text.secondary", mb: 4 }}>
-              A Python script is a simple, readable program that tells the
-              computer to perform a task — like sending emails, collecting data
-              from websites, or reminding you of deadlines. It’s like giving
-              your computer a to-do list that runs automatically.
+              Scriptify scans top job boards like LinkedIn, Glassdoor, and Comeet for new openings that match your keywords – and sends them straight to your inbox.
             </Typography>
             <Typography
               variant="body1"
               sx={{ color: "text.secondary", fontStyle: "italic" }}
             >
-              Scriptify helps anyone build these smart scripts without needing
-              to learn programming.
+              All you need to do is tell us what you're looking for.
             </Typography>
           </Container>
         </Box>
       </FadeInSection>
 
-      {/* No Code? No Problem. */}
+      {/* No Code Needed */}
       <FadeInSection>
         <Box
           minHeight="100vh"
@@ -147,12 +143,10 @@ function LandingPage({
         >
           <Container maxWidth="md">
             <Typography variant="h3" sx={{ fontWeight: 600, mb: 2 }}>
-              No Code? No Problem.
+              No experience needed.
             </Typography>
             <Typography variant="h6" sx={{ color: "text.secondary", mb: 4 }}>
-              With Scriptify, you can build Python scripts for real-world
-              automation without writing a single line of code. Just choose a
-              task, fill in your details, and download your ready-to-use script.
+              You don’t need to know Python or how to code. Scriptify builds your custom job alert script based on your answers in a friendly chat wizard.
             </Typography>
             <motion.div whileHover={{ scale: 1.05 }}>
               <Button
@@ -162,14 +156,14 @@ function LandingPage({
                 component={RouterLink}
                 to="/how-it-works"
               >
-                See how it works
+                Learn How It Works
               </Button>
             </motion.div>
           </Container>
         </Box>
       </FadeInSection>
 
-      {/* Generate Section */}
+      {/* Call to Action */}
       <FadeInSection>
         <Box
           minHeight="100vh"
@@ -185,16 +179,14 @@ function LandingPage({
         >
           <Container maxWidth="md">
             <Typography variant="h3" sx={{ fontWeight: 600, mb: 2, color: "white" }}>
-              Generate Python scripts instantly.
+              Start your job hunt the smart way.
             </Typography>
             <Typography variant="h6" sx={{ color: "text.secondary", mb: 4 }}>
-              Whether it's automating emails, job alerts, or daily tasks –
-              Scriptify builds the Python code for you in seconds. Just fill a
-              form and click “Generate”.
+              No more refreshing job sites every day. Scriptify will notify you the moment your dream job appears online.
             </Typography>
             <motion.div whileHover={{ scale: 1.05 }}>
               <Button variant="contained" size="large" color="primary" onClick={onLoginClick}>
-                Try it now
+                Start Now
               </Button>
             </motion.div>
           </Container>

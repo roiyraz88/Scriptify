@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import ChatWizard from "../components/ChatWizard";
 import API from "../api/axios";
 import {
@@ -20,14 +20,32 @@ function GenerateScriptPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
   const [showIntroModal, setShowIntroModal] = useState(true);
+  const [hasExistingScript, setHasExistingScript] = useState(false);
 
   const token = localStorage.getItem("accessToken");
+
+  useEffect(() => {
+    if (!token) return;
+
+    API.get("/profile/my-scripts", {
+      headers: { Authorization: `Bearer ${token}` },
+    })
+      .then((res) => {
+        if (res.data.scripts.length > 0) {
+          setHasExistingScript(true);
+        }
+      })
+      .catch((err) => {
+        console.error("❌ Failed to check existing scripts", err);
+      });
+  }, [token]);
 
   const handleJobAlertSubmit = async (answers: Record<string, string>) => {
     if (!token) {
       setError("❌ You must be logged in to generate a script.");
       return;
     }
+
     try {
       setLoading(true);
       setError("");
@@ -43,15 +61,30 @@ function GenerateScriptPage() {
         customization: answers.customization || "",
       };
 
-      await API.post("/scripts/generate", payload, {
+      const res = await API.post("/scripts/generate", payload, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      setSuccess(true);
-    } catch (err) {
-      setError("❌ Failed to generate job alert script.");
+      if (res.status === 204) {
+        setError("📭 No jobs found. Please try different keywords.");
+        return;
+      }
+
+      if (res.data.script) {
+        setSuccess(true);
+      } else {
+        setError("⚠️ Something went wrong. Script was not created.");
+      }
+    } catch (err: any) {
+      if (err.response?.status === 409) {
+        setError(
+          "⚠️ You already have a script. You can edit it from your profile."
+        );
+      } else {
+        setError("🚫 Something went wrong. Please try again later.");
+      }
       console.error(err);
     } finally {
       setLoading(false);
@@ -88,12 +121,37 @@ function GenerateScriptPage() {
       {loading && <CircularProgress sx={{ mt: 4 }} />}
 
       {error && (
-        <Alert severity="error" sx={{ mt: 2 }}>
-          {error}
-        </Alert>
+        <Box mt={2}>
+          <Alert severity="error">{error}</Alert>
+          <Button
+            variant="outlined"
+            onClick={() => {
+              setError("");
+              setSuccess(false);
+            }}
+            sx={{ mt: 2 }}
+          >
+            Try Again
+          </Button>
+        </Box>
       )}
 
-      {success ? (
+      {hasExistingScript ? (
+        <Box mt={4}>
+          <Alert severity="info">
+            📌 You already have a script. You can manage it in your{" "}
+            <strong>profile</strong>.
+          </Alert>
+          <Button
+            variant="contained"
+            color="primary"
+            sx={{ mt: 2 }}
+            href="/profile"
+          >
+            Go to Profile
+          </Button>
+        </Box>
+      ) : success ? (
         <Box mt={4}>
           <Alert severity="success">
             ✅ Script created successfully! You can view it on your{" "}
@@ -109,7 +167,7 @@ function GenerateScriptPage() {
           </Button>
         </Box>
       ) : (
-        <ChatWizard onComplete={handleJobAlertSubmit} />
+        !loading && !error && <ChatWizard onComplete={handleJobAlertSubmit} />
       )}
     </Container>
   );

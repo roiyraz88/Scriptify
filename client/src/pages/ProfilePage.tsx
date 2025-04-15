@@ -69,12 +69,17 @@ function ProfilePage() {
     try {
       const token = localStorage.getItem("accessToken");
 
-      // חיזוק השאילתה לשימוש באתרים רלוונטיים בלבד
       const updatedQuery = `site:linkedin.com/jobs OR site:glassdoor.com OR site:indeed.com "${editData.query}"`;
 
       const res = await API.put(
         `/profile/my-scripts/${selectedScriptId}`,
-        { ...editData, query: updatedQuery },
+        {
+          ...editData,
+          query: updatedQuery,
+          dailyTime: editData.dailyTime,
+          weeklyDay: editData.weeklyDay,
+          weeklyTime: editData.weeklyTime,
+        },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
