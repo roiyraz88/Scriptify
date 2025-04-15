@@ -21,6 +21,14 @@ const ScriptSchema = new mongoose.Schema({
     required: true,
   },
 
+  // נוסיף את זה כדי להציג נכון בפרופיל
+  dailyTime: {
+    type: String,
+    required: function (this: any) {
+      return this.frequencyType === "Every day";
+    },
+  },
+
   weeklyDay: {
     type: String,
     validate: {
@@ -31,8 +39,14 @@ const ScriptSchema = new mongoose.Schema({
     },
   },
 
-  customization: { type: String, default: "" },
+  weeklyTime: {
+    type: String,
+    required: function (this: any) {
+      return this.frequencyType === "Every week";
+    },
+  },
 
+  customization: { type: String, default: "" },
 
   createdAt: { type: Date, default: Date.now },
 });
