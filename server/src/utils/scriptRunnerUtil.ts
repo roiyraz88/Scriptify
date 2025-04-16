@@ -13,7 +13,6 @@ interface EmailOptions {
   text: string;
 }
 
-// חיפוש משרות בגוגל באמצעות SerpAPI עם סינון חכם
 export const searchJobsOnGoogle = async ({
   query,
   customization,
@@ -27,36 +26,32 @@ export const searchJobsOnGoogle = async ({
 
   const locationAddition = includesLocation ? "" : "Israel";
 
-  const fullQuery = `site:linkedin.com/jobs OR site:glassdoor.com OR site:www.comeet.com/jobs "${query}" "${customization}" "${locationAddition}"`;
+  const fullQuery = `
+    site:comeet.com/jobs OR
+    site:jobs.lever.co OR
+    site:boards.greenhouse.io OR
+    site:jobs.recruitee.com OR
+    site:jobs.ashbyhq.com
+    "${query}" "${customization}" "${locationAddition}"
+  `;
 
   const response = await axios.get("https://serpapi.com/search", {
     params: {
       engine: "google",
       q: fullQuery,
       api_key: SERP_API_KEY,
-      num: resultLimit + 10, // נוסיף עוד תוצאות לטובת סינון
+      num: resultLimit + 10,
     },
   });
 
   const allResults = response.data.organic_results || [];
 
-  // סינון תוצאות לא רלוונטיות (כמו רשימות)
-  const filteredResults = allResults.filter((result: any) => {
-    const title = result.title?.toLowerCase() || "";
-    const link = result.link?.toLowerCase() || "";
+  console.log("🔍 Raw results from SerpAPI:", allResults.length);
 
-    const looksLikeList = /\b\d{1,3}\s+(jobs|positions|משרות|מקומות|משרות פנויות)\b/.test(title);
-    const looksLikeRealJob =
-      link.includes("linkedin.com/jobs/view") ||
-      link.includes("glassdoor.com/job") ||
-      link.includes("comeet.com/jobs") ||
-      link.includes("/job");
-
-    return !looksLikeList && looksLikeRealJob;
-  });
-
-  return filteredResults.slice(0, resultLimit);
+  // אין סינון – מחזיר פשוט את הראשונים לפי limit
+  return allResults.slice(0, resultLimit);
 };
+
 
 // שליחת מייל טקסטואלי פשוט
 export const sendEmail = async ({ to, subject, text }: EmailOptions) => {
@@ -85,7 +80,10 @@ export const sendEmail = async ({ to, subject, text }: EmailOptions) => {
 };
 
 // הפיכת התוצאות למייל טקסט פשוט
-export const formatResultsForEmail = (results: any[], query: string): string => {
+export const formatResultsForEmail = (
+  results: any[],
+  query: string
+): string => {
   const topResults = results.map(
     (result, i) => `${i + 1}. ${result.title}\n${result.link}`
   );
