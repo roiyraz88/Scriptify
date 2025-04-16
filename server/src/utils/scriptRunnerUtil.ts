@@ -15,48 +15,37 @@ interface EmailOptions {
 
 export const searchJobsOnGoogle = async ({
   query,
-  customization,
-  resultLimit = 1,
+  customization = "",
+  resultLimit = 10,
 }: JobSearchOptions) => {
   const SERP_API_KEY = process.env.SERP_API_KEY!;
+  const safeCustomization = customization.toLowerCase();
 
   const includesLocation =
-    customization.toLowerCase().includes("israel") ||
-    customization.toLowerCase().includes("tel aviv");
+    safeCustomization.includes("israel") || safeCustomization.includes("tel aviv");
 
   const locationAddition = includesLocation ? "" : "Israel";
-  const fullQuery = `site:www.comeet.com/jobs "${query}" "${customization}" "${locationAddition}"`;
+  const fullQuery = `${query} ${customization} ${locationAddition}`;
 
   const response = await axios.get("https://serpapi.com/search", {
     params: {
       engine: "google",
       q: fullQuery,
       api_key: SERP_API_KEY,
-      num: Math.max(20, resultLimit * 2),
+      num: Math.max(30, resultLimit * 2),
     },
   });
 
   const results = response.data.organic_results || [];
 
   const filteredResults = results.filter((r: any) => {
-    const title = r.title?.toLowerCase() || "";
     const link = r.link?.toLowerCase() || "";
-
-    const isListPage =
-      /\b\d{1,4}\s+(jobs|positions|משרות|מקומות)\b/.test(title) ||
-      /\/jobs\/?$/.test(link);
-
-    const isJobPage =
-      link.includes("linkedin.com/jobs/view") ||
-      link.includes("glassdoor.com/job") ||
-      link.includes("comeet.com/jobs/") ||
-      link.includes("/job/");
-
-    return !isListPage && isJobPage;
+    return link.includes("job") || link.includes("position");
   });
 
   return filteredResults.slice(0, resultLimit);
 };
+
 
 export const sendEmail = async ({ to, subject, html }: EmailOptions) => {
   const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY!;
