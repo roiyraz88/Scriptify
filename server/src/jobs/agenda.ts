@@ -46,11 +46,10 @@ agenda.define("run-job-alert-script", async (job: Job<JobData>) => {
   if (!results.length) return;
 
   const emailBody = formatResultsForEmail(results, script.query);
-
   await sendEmail({
     to: user.email,
     subject: `🔁 Job Alert for "${script.query}"`,
-    html: `${emailBody.replace(/\n/g, "<br>")}<br><br><small>(Automated by Scriptify 🚀)</small>`,
+    text: `${emailBody}\n\n(Automated by Scriptify 🚀)`,
   });
 });
 
@@ -62,9 +61,12 @@ export const getCronString = (
 ): string => {
   const [hour, minute] = time.split(":").map(Number);
 
-  const localTime = DateTime.fromObject({ hour, minute }, {
-    zone: "Asia/Jerusalem",
-  });
+  const localTime = DateTime.fromObject(
+    { hour, minute },
+    {
+      zone: "Asia/Jerusalem",
+    }
+  );
   const utcTime = localTime.toUTC();
 
   if (frequencyType === "Every day") {

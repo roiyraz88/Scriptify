@@ -73,12 +73,10 @@ export const handleJobAlerts = async (req: Request, res: Response) => {
     }
 
     try {
-      const htmlBody = formatResultsForEmail(results, query);
-
       await sendEmail({
         to: emailRecipient,
         subject,
-        html: htmlBody, // ✅
+        text: emailBody, // <-- השתנה מ-html ל-text
       });
     } catch (err) {
       console.error("❌ Failed to send email:", err);

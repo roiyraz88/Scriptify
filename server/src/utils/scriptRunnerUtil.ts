@@ -10,7 +10,7 @@ interface JobSearchOptions {
 interface EmailOptions {
   to: string;
   subject: string;
-  html: string;
+  text: string; // <-- נכון
 }
 
 export const searchJobsOnGoogle = async ({
@@ -46,44 +46,50 @@ export const searchJobsOnGoogle = async ({
   return filteredResults.slice(0, resultLimit);
 };
 
-
-export const sendEmail = async ({ to, subject, html }: EmailOptions) => {
+export const sendEmail = async ({ to, subject, text }: EmailOptions) => {
   const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY!;
+  if (!SENDGRID_API_KEY) {
+    console.error("❌ SENDGRID_API_KEY is missing from environment variables.");
+    throw new Error("Missing SendGrid API Key");
+  }
 
-  const transporter = nodemailer.createTransport({
-    service: "SendGrid",
-    auth: {
-      user: "apikey",
-      pass: SENDGRID_API_KEY,
-    },
-  });
+  try {
+    const transporter = nodemailer.createTransport({
+      service: "SendGrid",
+      auth: {
+        user: "apikey",
+        pass: SENDGRID_API_KEY,
+      },
+    });
 
-  await transporter.sendMail({
-    from: "Scriptify Bot <bot.scriptify@gmail.com>",
-    to,
-    subject,
-    html,
-  });
+    const info = await transporter.sendMail({
+      from: "Scriptify Bot <bot.scriptify@gmail.com>",
+      to,
+      subject,
+      text,
+    });
+
+    console.log("📧 Email sent successfully:", info.messageId);
+  } catch (err: any) {
+    console.error("❌ Failed to send email:", err.message || err);
+    throw new Error("Email sending failed");
+  }
 };
 
 export const formatResultsForEmail = (results: any[], query: string): string => {
-  const items = results.map(
-    (result, i) => `
-      <div style="margin-bottom: 16px;">
-        <h3 style="margin: 0;">${i + 1}. ${result.title}</h3>
-        <p style="margin: 4px 0;">
-          <a href="${result.link}" target="_blank" style="color: #1a73e8;">🔗 ${result.link}</a>
-        </p>
-        <p style="margin: 4px 0; color: #444;">${result.snippet || ""}</p>
-      </div>
-    `
-  );
+  const items = results.map((result, i) => {
+    return `${i + 1}. ${result.title || "No title"}
+Link: ${result.link || "No link"}
+${result.snippet || ""}
+---------------------------`;
+  });
 
   return `
-    <div style="font-family: Arial, sans-serif; padding: 20px;">
-      <h2 style="color: #333;">🔎 Job Alert Results for "<em>${query}</em>"</h2>
-      ${items.join("")}
-      <p style="margin-top: 32px; font-size: 12px; color: #888;">This email was sent automatically by Scriptify 🚀</p>
-    </div>
-  `;
+🔎 Job Alert Results for "${query}"
+
+${items.join("\n")}
+
+--
+This email was sent automatically by Scriptify 🚀
+  `.trim();
 };
