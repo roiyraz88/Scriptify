@@ -28,7 +28,7 @@ function GenerateScriptPage() {
     if (!token) return;
 
     API.get("/profile/my-scripts", {
-      headers: { Authorization: `Bearer ${token}` },
+      withCredentials: true,
     })
       .then((res) => {
         if (res.data.scripts.length > 0) {
@@ -56,11 +56,10 @@ function GenerateScriptPage() {
         query: answers.query,
         resultLimit: answers.resultLimit,
         frequencyType: answers.frequencyType,
-        executionTime: answers.executionTime, 
+        executionTime: answers.executionTime,
         weeklyDay: answers.weeklyDay,
         customization: answers.customization || "",
       };
-      
 
       const res = await API.post("/scripts/generate", payload, {
         headers: {
