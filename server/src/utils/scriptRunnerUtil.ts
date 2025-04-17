@@ -21,21 +21,75 @@ export const searchJobsOnGoogle = async ({
   resultLimit?: number;
 }) => {
   const SERP_API_KEY = process.env.SERP_API_KEY!;
+  const searchEngines = [
+    `site:www.comeet.com/jobs ${query}`,
+    `site:www.jobinfo.co.il ${query}`,
+    `site:www.glassdoor.com ${query}`,
+  ];
 
-  const response = await axios.get("https://serpapi.com/search", {
-    params: {
-      engine: "google",
-      q: query, 
-      api_key: SERP_API_KEY,
-      num: resultLimit,
-      gl: "il", 
-      hl: "en", 
-    },
-  });
+  const allResults: any[] = [];
 
-  const results = response.data.organic_results || [];
-  return results.filter((r: any) => r.title && r.link);
+  for (const q of searchEngines) {
+    try {
+      const res = await axios.get("https://serpapi.com/search", {
+        params: {
+          engine: "google",
+          q,
+          api_key: SERP_API_KEY,
+          gl: "il",
+          hl: "en",
+          num: resultLimit,
+        },
+      });
+
+      const results = res.data.organic_results || [];
+
+      const filtered = results.filter((r: any) => {
+        if (!r.title || !r.link) return false;
+
+        const link = r.link.toLowerCase();
+        const title = r.title.toLowerCase();
+
+        const isJobLink =
+          link.includes("jobs") ||
+          link.includes("career") ||
+          link.includes("apply") ||
+          link.includes("commeet") ||
+          link.includes("jobinfo") ||
+          link.includes("glassdoor") ||
+          link.includes("job-openings") ||
+          link.includes("recruit") ||
+          link.includes("hiring");
+
+        const isNotGeneralContent =
+          !link.includes("blog") &&
+          !link.includes("what-is") &&
+          !link.includes("guide") &&
+          !title.includes("what is") &&
+          !title.includes("how to") &&
+          !title.includes("salary") &&
+          !title.includes("roadmap");
+
+        return isJobLink && isNotGeneralContent;
+      });
+
+      allResults.push(...filtered);
+    } catch (err) {
+      console.error(`❌ Error fetching results for query: ${q}`, err);
+    }
+  }
+
+  // הסר כפילויות לפי לינק
+  const uniqueResults = allResults.filter(
+    (result, index, self) =>
+      index === self.findIndex((r) => r.link === result.link)
+  );
+
+  // החזר רק עד resultLimit תוצאות
+  return uniqueResults.slice(0, resultLimit);
 };
+
+
 
 export const sendEmail = async ({ to, subject, text }: EmailOptions) => {
   const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY!;
@@ -62,7 +116,6 @@ export const sendEmail = async ({ to, subject, text }: EmailOptions) => {
   console.log(`📧 Email sent to ${to}`);
 };
 
-// הפיכת תוצאות למייל טקסט פשוט
 export const formatResultsForEmail = (
   results: any[],
   query: string
