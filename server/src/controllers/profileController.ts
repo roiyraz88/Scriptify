@@ -43,7 +43,6 @@ export const updateScript = async (req: Request, res: Response) => {
     frequencyType,
     executionTime,
     weeklyDay,
-    customization,
   } = req.body;
 
   if (!query || !frequencyType || !executionTime) {
@@ -57,7 +56,6 @@ export const updateScript = async (req: Request, res: Response) => {
       resultLimit,
       frequencyType,
       executionTime,
-      customization,
     };
 
     if (frequencyType === "Every week") {

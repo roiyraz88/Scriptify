@@ -13,46 +13,30 @@ interface EmailOptions {
   text: string;
 }
 
-// חיפוש משרות בגוגל באמצעות SerpAPI (ללא סינון)
 export const searchJobsOnGoogle = async ({
   query,
-  customization,
   resultLimit = 10,
-}: JobSearchOptions) => {
+}: {
+  query: string;
+  resultLimit?: number;
+}) => {
   const SERP_API_KEY = process.env.SERP_API_KEY!;
-  const safeCustomization = customization.toLowerCase();
-
-  const includesLocation =
-    safeCustomization.includes("israel") || safeCustomization.includes("tel aviv");
-
-  const locationAddition = includesLocation ? "" : "Israel";
-
-  const fullQuery = `
-    site:comeet.com/jobs OR
-    site:jobs.lever.co OR
-    site:boards.greenhouse.io OR
-    site:jobs.recruitee.com OR
-    site:jobs.ashbyhq.com
-    "${query}" "${customization}" "${locationAddition}"
-  `;
 
   const response = await axios.get("https://serpapi.com/search", {
     params: {
       engine: "google",
-      q: fullQuery,
+      q: query, 
       api_key: SERP_API_KEY,
-      num: resultLimit + 10,
+      num: resultLimit,
+      gl: "il", 
+      hl: "en", 
     },
   });
 
-  const allResults = response.data.organic_results || [];
-
-  console.log("🔍 Raw results from SerpAPI:", allResults.length);
-
-  return allResults.slice(0, resultLimit);
+  const results = response.data.organic_results || [];
+  return results.filter((r: any) => r.title && r.link);
 };
 
-// שליחת מייל טקסטואלי פשוט מ־Scriptify
 export const sendEmail = async ({ to, subject, text }: EmailOptions) => {
   const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY!;
   if (!SENDGRID_API_KEY) {
@@ -69,7 +53,7 @@ export const sendEmail = async ({ to, subject, text }: EmailOptions) => {
   });
 
   await transporter.sendMail({
-    from: "Scriptify Bot <no-reply@scriptify.online>", // ✅ שימוש בדומיין המאומת
+    from: "Scriptify Bot <no-reply@scriptify.online>", 
     to,
     subject,
     text,

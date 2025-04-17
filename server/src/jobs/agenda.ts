@@ -40,7 +40,6 @@ agenda.define("run-job-alert-script", async (job: Job<JobData>) => {
   const results: JobResult[] = await searchJobsOnGoogle({
     query: script.query,
     resultLimit: script.resultLimit,
-    customization: script.customization || "",
   });
 
   if (!results.length) return;

@@ -9,7 +9,6 @@ export const generateScriptController = async (req: Request, res: Response) => {
     frequencyType,
     executionTime, 
     weeklyDay,
-    customization,
   } = req.body;
 
   if (!emailRecipient || !query || !resultLimit || !frequencyType || !executionTime) {

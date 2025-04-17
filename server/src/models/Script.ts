@@ -28,8 +28,6 @@ const ScriptSchema = new mongoose.Schema({
     },
   },
 
-  customization: { type: String, default: "" },
-
   createdAt: { type: Date, default: Date.now },
 });
 

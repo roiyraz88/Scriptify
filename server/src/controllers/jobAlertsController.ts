@@ -18,7 +18,6 @@ export const handleJobAlerts = async (req: Request, res: Response) => {
     frequencyType,
     executionTime,
     weeklyDay,
-    customization,
   } = req.body;
 
   if (!emailRecipient || !query || !frequencyType || !executionTime) {
@@ -26,7 +25,9 @@ export const handleJobAlerts = async (req: Request, res: Response) => {
   }
 
   if (frequencyType === "Every week" && !weeklyDay) {
-    return res.status(400).json({ message: "weeklyDay is required for weekly frequency" });
+    return res
+      .status(400)
+      .json({ message: "weeklyDay is required for weekly frequency" });
   }
 
   try {
@@ -39,7 +40,6 @@ export const handleJobAlerts = async (req: Request, res: Response) => {
     console.log("🔍 Searching for jobs...");
     const results = await searchJobsOnGoogle({
       query,
-      customization,
       resultLimit,
     });
 
@@ -71,7 +71,6 @@ export const handleJobAlerts = async (req: Request, res: Response) => {
       frequencyType,
       executionTime,
       weeklyDay: frequencyType === "Every week" ? weeklyDay : undefined,
-      customization,
     });
 
     console.log("📅 Scheduling job with Agenda...");
@@ -85,14 +84,11 @@ export const handleJobAlerts = async (req: Request, res: Response) => {
       $push: { scripts: script._id },
     });
 
-    // ⚠️ Gemini moved out of main flow (optional: run via Agenda)
-    console.log("🧠 Generating script with Gemini (non-blocking)...");
     generatePythonScriptFromPrompt(
-      `Search for job postings related to "${query}" using SerpAPI, and send the results to ${emailRecipient} via Gmail. ${customization || ""}`
+      `Search for job postings related to "${query}" using SerpAPI, and send the results to ${emailRecipient} via Gmail.`
     )
       .then((generatedScript) => {
         console.log("✅ Gemini script generated.");
-        // אפשר לשמור אותו במסד אם רוצים
       })
       .catch((err) => {
         console.error("❌ Gemini generation failed:", err.message);
@@ -105,6 +101,8 @@ export const handleJobAlerts = async (req: Request, res: Response) => {
     });
   } catch (error) {
     console.error("❌ Job Alert Error:", error);
-    return res.status(500).json({ message: "❌ Failed to create job alert script" });
+    return res
+      .status(500)
+      .json({ message: "❌ Failed to create job alert script" });
   }
 };

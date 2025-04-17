@@ -9,7 +9,6 @@ const GEMINI_BASE_URL = `https://generativelanguage.googleapis.com/v1/models/gem
 export const generatePythonScriptFromPrompt = async (
   userPrompt: string
 ): Promise<string> => {
-  console.log(userPrompt);
   try {
     const fullPrompt = `
     You are a Python script generator designed to automate job alert emails.
