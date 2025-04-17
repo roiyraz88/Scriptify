@@ -28,7 +28,9 @@ function GenerateScriptPage() {
     if (!token) return;
 
     API.get("/profile/my-scripts", {
-      withCredentials: true,
+      headers: {
+        Authorization: `Bearer ${token}`, 
+      },
     })
       .then((res) => {
         if (res.data.scripts.length > 0) {
