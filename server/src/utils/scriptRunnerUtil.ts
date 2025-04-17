@@ -13,6 +13,7 @@ interface EmailOptions {
   text: string;
 }
 
+// חיפוש משרות בגוגל באמצעות SerpAPI (ללא סינון)
 export const searchJobsOnGoogle = async ({
   query,
   customization,
@@ -48,12 +49,10 @@ export const searchJobsOnGoogle = async ({
 
   console.log("🔍 Raw results from SerpAPI:", allResults.length);
 
-  // אין סינון – מחזיר פשוט את הראשונים לפי limit
   return allResults.slice(0, resultLimit);
 };
 
-
-// שליחת מייל טקסטואלי פשוט
+// שליחת מייל טקסטואלי פשוט מ־Scriptify
 export const sendEmail = async ({ to, subject, text }: EmailOptions) => {
   const SENDGRID_API_KEY = process.env.SENDGRID_API_KEY!;
   if (!SENDGRID_API_KEY) {
@@ -70,7 +69,7 @@ export const sendEmail = async ({ to, subject, text }: EmailOptions) => {
   });
 
   await transporter.sendMail({
-    from: "Scriptify Bot <bot.scriptify@gmail.com>",
+    from: "Scriptify Bot <no-reply@scriptify.online>", // ✅ שימוש בדומיין המאומת
     to,
     subject,
     text,
@@ -79,7 +78,7 @@ export const sendEmail = async ({ to, subject, text }: EmailOptions) => {
   console.log(`📧 Email sent to ${to}`);
 };
 
-// הפיכת התוצאות למייל טקסט פשוט
+// הפיכת תוצאות למייל טקסט פשוט
 export const formatResultsForEmail = (
   results: any[],
   query: string
