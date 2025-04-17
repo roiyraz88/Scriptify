@@ -11,15 +11,5 @@
       "src": "/(.*)",
       "dest": "/server.ts"
     }
-  ],
-  "env": {
-    "PORT": "5000",
-    "SENDGRID_API_KEY": "@sendgrid_api_key",
-    "SERP_API_KEY": "@serp_api_key"
-  },
-  "build": {
-    "env": {
-      "NPM_CONFIG_LEGACY_PEER_DEPS": "true"
-    }
-  }
+  ]
 }
