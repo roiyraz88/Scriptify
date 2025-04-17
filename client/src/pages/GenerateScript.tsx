@@ -29,7 +29,7 @@ function GenerateScriptPage() {
 
     API.get("/profile/my-scripts", {
       headers: {
-        Authorization: `Bearer ${token}`, 
+        Authorization: `Bearer ${token}`,
       },
     })
       .then((res) => {
@@ -60,7 +60,6 @@ function GenerateScriptPage() {
         frequencyType: answers.frequencyType,
         executionTime: answers.executionTime,
         weeklyDay: answers.weeklyDay,
-        customization: answers.customization || "",
       };
 
       const res = await API.post("/scripts/generate", payload, {

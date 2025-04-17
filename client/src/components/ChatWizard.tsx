@@ -17,7 +17,6 @@ type StepType =
   | { id: "frequencyType"; question: string; options: string[] }
   | { id: "weeklyDay"; question: string; options: string[] }
   | { id: "executionTime"; question: string; options: string[] }
-  | { id: "customization"; question: string }
   | { id: "done" };
 
 const initialSteps: StepType[] = [
@@ -38,10 +37,6 @@ const initialSteps: StepType[] = [
     question: "How often would you like this script to run?",
     options: ["Every day", "Every week"],
   },
-  {
-    id: "customization",
-    question: "Any custom filters? (e.g., Only full-time jobs in Tel Aviv)",
-  },
 ];
 
 const stepHints: Record<string, string> = {
@@ -52,8 +47,6 @@ const stepHints: Record<string, string> = {
   frequencyType: "⏱️ Decide how often the script should run: daily or weekly.",
   executionTime: "🕒 Choose the hour you'd like the script to run.",
   weeklyDay: "📅 Select the day of the week to run the job alert.",
-  customization:
-    "🛠️ Add filters like location, job type or seniority (e.g. 'only remote jobs in Israel').",
 };
 
 const isValidEmail = (email: string): boolean =>
@@ -102,15 +95,12 @@ function ChatWizard({
     );
 
     if (currentStep.id === "frequencyType") {
-      const customizationStep = steps.find((s) => s.id === "customization");
-
       if (answer === "Every day") {
         newSteps.push({
           id: "executionTime",
           question: "At what hour should the script run?",
           options: hourOptions,
         });
-        if (customizationStep) newSteps.push(customizationStep);
         newSteps.push({ id: "done" });
       } else if (answer === "Every week") {
         newSteps.push({
@@ -131,7 +121,6 @@ function ChatWizard({
           question: "At what hour should the script run?",
           options: hourOptions,
         });
-        if (customizationStep) newSteps.push(customizationStep);
         newSteps.push({ id: "done" });
       }
 
@@ -255,11 +244,7 @@ function ChatWizard({
             <>
               <TextField
                 fullWidth
-                placeholder={
-                  currentStep.id === "customization"
-                    ? "e.g. Only remote jobs in Tel Aviv"
-                    : "Type your answer..."
-                }
+                placeholder="Type your answer..."
                 value={inputValue}
                 onChange={(e) => setInputValue(e.target.value)}
                 onKeyDown={(e) => {

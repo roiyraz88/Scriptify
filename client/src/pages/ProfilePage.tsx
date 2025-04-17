@@ -26,7 +26,6 @@ interface Script {
   frequencyType: string;
   executionTime: string;
   weeklyDay?: string;
-  customization?: string;
   createdAt: string;
 }
 
@@ -67,12 +66,9 @@ function ProfilePage() {
   const handleEditSave = async () => {
     try {
       const token = localStorage.getItem("accessToken");
-
       const res = await API.put(
         `/profile/my-scripts/${selectedScriptId}`,
-        {
-          ...editData,
-        },
+        { ...editData },
         {
           headers: { Authorization: `Bearer ${token}` },
         }
@@ -94,6 +90,7 @@ function ProfilePage() {
     { length: 24 },
     (_, i) => `${i.toString().padStart(2, "0")}:00`
   );
+
   const days = [
     "Sunday",
     "Monday",
@@ -139,31 +136,20 @@ function ProfilePage() {
                 <Typography sx={{ color: "#fff" }}>
                   <strong>🔍 Query:</strong> {script.query}
                 </Typography>
-
-                {script.customization && (
-                  <Typography sx={{ color: "#fff" }}>
-                    <strong>🧩 Customization:</strong> {script.customization}
-                  </Typography>
-                )}
-
                 <Typography sx={{ color: "#fff" }}>
                   <strong>📬 Result Limit:</strong> {script.resultLimit}
                 </Typography>
-
                 <Typography sx={{ color: "#fff" }}>
                   <strong>⏰ Frequency:</strong> {script.frequencyType}
                 </Typography>
-
                 {script.frequencyType === "Every week" && script.weeklyDay && (
                   <Typography sx={{ color: "#fff" }}>
                     <strong>📅 Day:</strong> {script.weeklyDay}
                   </Typography>
                 )}
-
                 <Typography sx={{ color: "#fff" }}>
                   <strong>🕐 Time:</strong> {script.executionTime}
                 </Typography>
-
                 <Typography variant="caption" sx={{ color: "#aaa" }}>
                   Created: {new Date(script.createdAt).toLocaleString()}
                 </Typography>
@@ -197,9 +183,7 @@ function ProfilePage() {
 
       {/* Delete Confirmation */}
       <Dialog open={confirmOpen} onClose={() => setConfirmOpen(false)}>
-        <DialogTitle>
-          ❗ Are you sure you want to delete this script?
-        </DialogTitle>
+        <DialogTitle>❗ Are you sure you want to delete this script?</DialogTitle>
         <DialogActions>
           <Button onClick={() => setConfirmOpen(false)} color="inherit">
             Cancel
@@ -298,16 +282,6 @@ function ProfilePage() {
               ))}
             </TextField>
           )}
-
-          <TextField
-            label="Customization"
-            multiline
-            rows={2}
-            value={editData.customization || ""}
-            onChange={(e) =>
-              setEditData({ ...editData, customization: e.target.value })
-            }
-          />
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setEditOpen(false)}>Cancel</Button>
