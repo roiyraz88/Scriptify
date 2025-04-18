@@ -26,7 +26,7 @@ interface JobResult {
   link: string;
 }
 
-agenda.define<JobData>("run-job-alert-script", async (job: Job<JobData>) => {
+agenda.define("run-job-alert-script", async (job: Job<JobData>) => {
   console.log(`🚀 Job started at ${new Date().toLocaleString()}`);
   const { scriptId } = job.attrs.data;
 
@@ -50,5 +50,6 @@ agenda.define<JobData>("run-job-alert-script", async (job: Job<JobData>) => {
     text: `${emailBody}\n\n(Automated by Scriptify 🚀)`,
   });
 });
+
 
 export default agenda;
