@@ -39,6 +39,11 @@ import express from "express";
    })
  );
  
+ app.get("/health", (req, res) => {
+  res.send("✅ Backend is alive!");
+});
+
+
  app.use(express.json());
  app.use(cookieParser());
  
