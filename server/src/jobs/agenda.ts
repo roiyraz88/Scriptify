@@ -1,4 +1,4 @@
-import Agenda, { Job } from "agenda";
+import Agenda, { Job, JobAttributesData  } from "agenda";
 import Script from "../models/Script";
 import User from "../models/User";
 import {
@@ -17,7 +17,7 @@ const agenda = new Agenda({
   },
 });
 
-interface JobData {
+interface JobData extends JobAttributesData  {
   scriptId: string;
 }
 
@@ -26,7 +26,7 @@ interface JobResult {
   link: string;
 }
 
-agenda.define("run-job-alert-script", async (job: Job<JobData>) => {
+agenda.define<JobData>("run-job-alert-script", async (job: Job<JobData>) => {
   console.log(`🚀 Job started at ${new Date().toLocaleString()}`);
   const { scriptId } = job.attrs.data;
 
