@@ -1,4 +1,4 @@
-import Agenda, { Job, JobAttributesData  } from "agenda";
+import Agenda, { Job, JobAttributesData } from "agenda";
 import Script from "../models/Script";
 import User from "../models/User";
 import {
@@ -17,9 +17,9 @@ const agenda = new Agenda({
   },
 });
 
-interface JobData extends JobAttributesData  {
+type JobData = JobAttributesData & {
   scriptId: string;
-}
+};
 
 interface JobResult {
   title: string;
@@ -50,7 +50,5 @@ agenda.define<JobData>("run-job-alert-script", async (job: Job<JobData>) => {
     text: `${emailBody}\n\n(Automated by Scriptify 🚀)`,
   });
 });
-
-
 
 export default agenda;
