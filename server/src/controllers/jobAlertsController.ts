@@ -75,9 +75,14 @@ export const handleJobAlerts = async (req: Request, res: Response) => {
 
     console.log("📅 Scheduling job with Agenda...");
     const cronString = getCronString(frequencyType, executionTime, weeklyDay);
-    await agenda.schedule(cronString, "run-job-alert-script", {
-      scriptId: script._id,
-    });
+
+    await agenda.cancel({ "data.scriptId": script._id });
+
+    const job = agenda.create("run-job-alert-script", { scriptId: script._id });
+    job.repeatEvery(cronString, { timezone: "Asia/Jerusalem" });
+    await job.save();
+    
+    
 
     console.log("👤 Updating user...");
     await User.findByIdAndUpdate((req as any).userId, {

@@ -11,22 +11,27 @@ dotenv.config();
 
 const app = express();
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://scriptify-two-blue.vercel.app",
+];
+
 app.use(
   cors({
-    origin: (origin, callback) => {
-      const allowed = [
-        "http://localhost:5173",
-        "https://scriptify-two-blue.vercel.app",
-      ];
-      if (!origin || allowed.includes(origin)) {
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
         callback(null, true);
       } else {
+        console.error("❌ Blocked by CORS:", origin);
         callback(new Error("Not allowed by CORS"));
       }
     },
     credentials: true,
+    optionsSuccessStatus: 200, 
   })
 );
+
+app.options("*", cors());
 
 app.use(express.json());
 app.use(cookieParser());
