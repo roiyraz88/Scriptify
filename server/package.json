@@ -10,7 +10,8 @@
     "start": "node dist/server.js",
     "build": "tsc",
     "lint": "eslint . --ext .ts",
-    "dev": "nodemon ./server.ts"
+    "dev": "nodemon ./server.ts",
+    "agenda": "ts-node src/jobs/agendaServer.ts"
   },
   "keywords": [],
   "author": "",
