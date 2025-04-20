@@ -1,17 +1,22 @@
+import express from "express";
 import dotenv from "dotenv";
+import agenda from "./agenda"; 
+import connectDB from "../config/db"; 
+
 dotenv.config();
 
-import agenda from "./agenda";
-import connectDB from "../config/db";
+const PORT = process.env.PORT || 3001; 
+const app = express();
 
-const startAgendaWorker = async () => {
-  await connectDB();
-  console.log("🟢 MongoDB connected (Agenda Worker)");
-
+connectDB().then(async () => {
   await agenda.start();
   console.log("⚙️ Agenda started and running...");
-};
 
-startAgendaWorker().catch((err) => {
-  console.error("❌ Failed to start Agenda worker:", err);
+  app.get("/", (req, res) => {
+    res.send("Agenda worker is alive!");
+  });
+
+  app.listen(PORT, () => {
+    console.log(`🟢 Dummy server listening on port ${PORT}`);
+  });
 });
