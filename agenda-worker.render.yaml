@@ -1,0 +1,19 @@
+services:
+  - type: worker
+    name: scriptify-agenda-worker
+    env: node
+    region: oregon
+    plan: free
+    buildCommand: cd server && npm install
+    startCommand: cd server && npm run agenda
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: MONGO_URI
+        sync: false
+      - key: SENDGRID_API_KEY
+        sync: false
+      - key: SERP_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
