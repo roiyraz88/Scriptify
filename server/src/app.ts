@@ -15,6 +15,7 @@ import express from "express";
   "https://scriptify-two-blue.vercel.app",
 ];
 
+// לפני כל route
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin || allowedOrigins.includes(origin)) {
@@ -25,10 +26,18 @@ app.use(cors({
   },
   credentials: true,
 }));
- 
- app.get("/health", (req, res) => {
-  res.send("✅ Backend is alive!");
-});
+
+// טיפול ב-OPTIONS
+app.options("*", cors({
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
+  credentials: true,
+}));
 
 
  app.use(express.json());
